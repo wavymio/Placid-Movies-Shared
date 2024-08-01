@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs')
+const { v2: cloudinary } = require('cloudinary')
 const User = require('../models/users')
 const generateTokenAndSetCookie = require('../utils/generateToken')
 const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10)
@@ -53,7 +54,53 @@ const signupUser = async (req, res) => {
     }
 }
 
-const validateUser = async (req, res) => {
+const patchEditUsername = async (req, res) => {
+    try {
+        const { username } = req.body
+
+        const user = await User.findById(req.userId)
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        const usernameExists= await User.findOne({ username })
+
+        if (usernameExists) {
+            return res.status(409).json({error: "Username already exists"})
+        }
+
+        user.username = username
+        await user.save()
+        return res.status(201).json({ success: "Update Successfull!" })
+        
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({error: "Internal server error"})
+    }
+}
+
+const patchEditProfilePic = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId)
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        const profilePicture = await uploadImage(req.file)
+
+        user.profilePicture = profilePicture
+        await user.save()
+        return res.status(201).json({ success: "Update Successfull!" })
+        
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({error: "Internal server error"})
+    }
+}
+
+const getUser = async (req, res) => {
     try {
         const { userId } = req
         const user = await User.findById(userId).select("-password")
@@ -79,9 +126,20 @@ const logoutUser = async (req, res) => {
     }
 }
 
+const uploadImage = async (file) => {
+    const image = file
+    const base64Image = Buffer.from(image.buffer).toString("base64")
+    const dataURI = `data:${image.mimetype};base64,${base64Image}`
+
+    const uploadResponse = await cloudinary.uploader.upload(dataURI)
+    return uploadResponse.url
+}
+
 module.exports = {
+    patchEditUsername,
+    patchEditProfilePic,
     loginUser,
     signupUser,
-    validateUser,
-    logoutUser
+    getUser,
+    logoutUser,
 }

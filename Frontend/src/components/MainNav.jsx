@@ -2,11 +2,9 @@ import React, { useState } from 'react'
 import { Separator } from './ui/separator'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
-import SearchBar from './SearchBar'
 
-const MainNav = ({ isLoggedIn, user, logout, isLoading }) => {
+const MainNav = ({ isLoggedIn, user, logout, isLoading, isAuthLoading }) => {
     const queryClient = useQueryClient()
-    const navigate = useNavigate()
     const [profileDrop, setProfileDrop] = useState(false)
     const [done, setDone] = useState(false)
 
@@ -39,7 +37,7 @@ const MainNav = ({ isLoggedIn, user, logout, isLoading }) => {
                 {user && (
                     <div className='font-bold'>{user.username} </div>
                 )}
-                <img onClick={handlePfpClick} src='https://via.placeholder.com/150' className='h-10 w-10 rounded-full border-2 border-gray-200 cursor-pointer transition-transform transform hover:scale-105' />
+                <img onClick={handlePfpClick} src={user?.profilePicture ? user?.profilePicture : 'https://via.placeholder.com/150'} className='h-10 w-10 rounded-full border-2 border-gray-200 cursor-pointer transition-transform transform hover:scale-105' />
             </div>
             <div className={`shadow-lg z-10 w-40 border border-gray-300 font-semibold bg-black text-white absolute right-0 mt-2 flex flex-col rounded-lg transition-opacity duration-500 ease-in-out ${profileDrop ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 {isLoggedIn && user ? (

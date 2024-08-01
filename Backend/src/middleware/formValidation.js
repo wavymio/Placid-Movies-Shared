@@ -1,6 +1,9 @@
 const { body, validationResult } = require('express-validator')
 
 const handleValidationErrors = async (req, res, next) => {
+    if (req.body.type === "profilePicture") {
+        next()
+    }
     const errors = validationResult(req)
 
     if (!errors.isEmpty()) {
@@ -16,6 +19,12 @@ const validateMyUserRequest = [
     handleValidationErrors,
 ]
 
+const validateMyPatchEditRequest = [
+    body("username").isString().notEmpty().withMessage("Username must be a string"),
+    handleValidationErrors,
+]
+
 module.exports = {
-    validateMyUserRequest
+    validateMyUserRequest,
+    validateMyPatchEditRequest
 }

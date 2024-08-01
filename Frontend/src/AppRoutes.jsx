@@ -6,6 +6,8 @@ import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import ProtectedRoute from './auth/ProtectedRoute'
 import AuthRoute from './auth/AuthRoute'
+import UserProfile from './pages/UserProfile'
+import OtherUserProfile from './pages/OtherUserProfile'
 
 const AppRoutes = () => {
     return (
@@ -13,6 +15,12 @@ const AppRoutes = () => {
             <Route path='/' element={
                 <Layout>
                     <Home />
+                </Layout>
+            } />
+
+            <Route path='/user/:id' element={
+                <Layout>
+                    <OtherUserProfile />
                 </Layout>
             } />
 
@@ -28,11 +36,11 @@ const AppRoutes = () => {
                     </Layout>
                 } />
             </Route>
-            
+
             <Route element={<ProtectedRoute />}>
                 <Route path='/user-profile' element={
                     <Layout>
-                        <div>User Profile</div>
+                        <UserProfile />
                     </Layout>
                 } />
             </Route>

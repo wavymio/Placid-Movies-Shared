@@ -10,14 +10,14 @@ import MobileSearchBar from './MobileSearchBar'
 
 const Header = () => {
     // const {isError, userInfo} = useValidateMyUser()
-    const { isLoggedIn, loggedInUser } = useAuth()
+    const { isLoggedIn, loggedInUser, isLoading: isAuthLoading } = useAuth()
     const { logoutUser, isLoading } = useLogoutMyUser()
 
     return (
         <>
-            <div className='bg-black py-5 relative'>
+            <div className='bg-black py-5 w-full fixed z-30 mb-10'>
                 <div className="container mx-auto flex justify-between items-center">
-                    <Link to={'/'} className='text-sm  sm:text-xl font-heading font-bold tracking-wider text-white'>
+                    <Link to={'/'} className='text-sm sm:text-xl font-heading font-bold tracking-wider text-white'>
                         PLÂCID
                     </Link>
                     <div className='hidden sm:block sm:w-96 sm:relative'>
@@ -28,10 +28,10 @@ const Header = () => {
                             <MobileSearchBar />
                         </div>
                         <div className='xs:hidden'>
-                            <MobileNav isLoggedIn={isLoggedIn} user={loggedInUser} logout={logoutUser} isLoading={isLoading} />
+                            <MobileNav isAuthLoading={isAuthLoading} isLoggedIn={isLoggedIn} user={loggedInUser} logout={logoutUser} isLoading={isLoading} />
                         </div>
                         <div className='hidden xs:block '>
-                            <MainNav isLoggedIn={isLoggedIn} user={loggedInUser} logout={logoutUser} isLoading={isLoading} />
+                            <MainNav isAuthLoading={isAuthLoading} isLoggedIn={isLoggedIn} user={loggedInUser} logout={logoutUser} isLoading={isLoading} />
                         </div>
                     </div>
                 </div>

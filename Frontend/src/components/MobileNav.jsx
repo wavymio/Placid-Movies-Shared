@@ -4,7 +4,7 @@ import { Separator } from './ui/separator'
 import { useQueryClient } from 'react-query'
 import { IoLogOut } from "react-icons/io5"
 
-const MobileNav = ({ isLoggedIn, user, logout, isLoading }) => {
+const MobileNav = ({ isLoggedIn, user, logout, isLoading, isAuthLoading }) => {
     const queryClient = useQueryClient()
     const [profileDrop, setProfileDrop] = useState(false)
     const [done, setDone] = useState(false)
@@ -34,7 +34,7 @@ const MobileNav = ({ isLoggedIn, user, logout, isLoading }) => {
 
     return (
         <div className='text-xs'>
-            <img onClick={handlePfpClick} src='https://via.placeholder.com/150' className='h-7 w-7 rounded-full border-2 border-gray-200 cursor-pointer transition-transform transform hover:scale-105' />
+            <img onClick={handlePfpClick} src={user?.profilePicture ? user?.profilePicture : 'https://via.placeholder.com/150'} className='h-7 w-7 rounded-full border-2 border-gray-200 cursor-pointer transition-transform transform hover:scale-105' />
             <div className={`px-6 shadow-lg z-10 absolute right-0 mt-4 w-full bg-black font-semibold text-white transition-opacity duration-500 ease-in-out ${profileDrop ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 <div className={`w-full flex flex-col`}>
                     {isLoggedIn && user ? (

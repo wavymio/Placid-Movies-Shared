@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    badge: {
+        type: String,
+        enum: ['Noob', 'Amateur', 'Pro', 'Legend']
+    },
     email: {
         type: String,
     },
@@ -22,6 +26,9 @@ const userSchema = new mongoose.Schema({
     country: {
         type: String
     },
+    age: {
+        type: Number
+    },
     accountCreatedAt: { 
         type: Date,
         default: Date.now 
@@ -32,7 +39,23 @@ const userSchema = new mongoose.Schema({
     friends: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    rooms: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Room'
+    }],
+    savedRooms: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Room'
+    }],
+    favoriteRooms: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Room'
+    }],
+    verified: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const User = mongoose.model("User", userSchema)

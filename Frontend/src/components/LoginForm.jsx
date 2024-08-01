@@ -59,11 +59,11 @@ const LoginForm = ({ buttonText, bottomText, bottomLinkText, bottomLink, handleL
                 <form className='w-full' onSubmit={onSubmit}>
                     <div className=' flex flex-col w-full gap-6'>
                         <div className='w-full flex flex-col items-left'>
-                            <input value={inputs.username} onChange={(e) => setInputs({...inputs, username: e.target.value.toLowerCase()})} className='w-full p-3 rounded-lg border border-neutral-800 bg-inherit focus:outline-none focus:ring-1 focus:ring-neutral-800 placeholder-neutral-200' placeholder='Username' />
+                            <input value={inputs.username} onChange={(e) => setInputs({...inputs, username: e.target.value.toLowerCase()})} className='w-full p-3 rounded-lg border border-neutral-800 bg-inherit focus:outline-none focus:ring-1 focus:ring-neutral-800 placeholder-neutral-200 placeholder:text-sm' placeholder='Username' />
                             {usernameError && (<span className='text-xs ml-1 mt-1 text-red-500'>{usernameError}</span>)}
                         </div>
                         <div className='w-full flex flex-col items-left'>
-                            <input value={inputs.password} onChange={(e) => setInputs({...inputs, password: e.target.value})} className='w-full p-3 rounded-lg border border-neutral-800 bg-inherit focus:outline-none focus:ring-1 focus:ring-neutral-800 placeholder-neutral-200' placeholder='Password'type='password' />
+                            <input value={inputs.password} onChange={(e) => setInputs({...inputs, password: e.target.value})} className='w-full p-3 rounded-lg border border-neutral-800 bg-inherit focus:outline-none focus:ring-1 focus:ring-neutral-800 placeholder-neutral-200 placeholder:text-sm' placeholder='Password' type='password' />
                             {passwordError && (<span className='text-xs ml-1 mt-1 text-red-500'>{passwordError}</span>)}
                         </div>
                         <button className={`p-3 rounded-lg font-bold bg-neutral-800 tracking-tightest hover:bg-neutral-900 border-white border-1 transition-colors ease-in-out duration-300`} type='submit' disabled={isLoading}>{isLoading ? (

@@ -51,6 +51,21 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+
+        'gradient-pink': '#DD2A7B',
+        'gradient-purple': '#833AB4',
+        'gradient-yellow': '#FEDA77',
+        'gradient-orange': '#F58529',
+        'gradient-light-gray': '#B0B0B0',      
+        'gradient-medium-gray': '#606060',      
+        'gradient-dark-gray': '#303030',      
+        'gradient-deep-red': '#D32F2F',      
+        'gradient-soft-pink': '#F48FB1',      
+        'gradient-rose-gold': '#F7B7A3',      
+        'gradient-dark-purple': '#4A148C',      
+        'gradient-midnight-black': '#212121',      
+        'gradient-pumpkin-orange': '#FF5722',
+        'gradient-main': '#27272a',      
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -69,7 +84,6 @@ module.exports = {
         heading: ['Raleway', 'sans-serif'],
         special: ['PT Sans', 'sans-serif'],
       },
-      backdropFilter: ['responsive'],
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -86,5 +100,7 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate")
+  ],
 }

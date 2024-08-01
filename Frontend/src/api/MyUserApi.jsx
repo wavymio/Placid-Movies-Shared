@@ -3,12 +3,12 @@ import { useToast } from "../contexts/ToastContext"
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
-export const useValidateMyUser = () => {
+export const useGetMyUser = () => {
     const { addToast } = useToast()
 
-    const validateMyUserRequest = async () => {
+    const getMyUserRequest = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/my/user/validate`, {
+            const response = await fetch(`${API_BASE_URL}/api/my/user/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json" 
@@ -35,7 +35,7 @@ export const useValidateMyUser = () => {
         }
     }
 
-    const { data:userInfo, isLoading, isError } = useQuery("validateUser", validateMyUserRequest, {
+    const { data:userInfo, isLoading, isError } = useQuery("validateUser", getMyUserRequest, {
         retry: false
     })
 
@@ -109,6 +109,73 @@ export const useCreateMyUser = () => {
     const {mutateAsync: createUser, isSuccess, isError, isLoading, error} = useMutation(createMyUserRequest)   
 
     return {createUser, isLoading, isError, isSuccess, error}
+}
+
+export const usePatchEditMyUser = () => {
+    const { addToast } = useToast()
+
+    const patchEditMyUserRequest = async (inputs) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/my/user/edit/username`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: 'include',
+                body: JSON.stringify(inputs)
+            })
+    
+            if (!response.ok) {
+                const error = await response.json() 
+                    if (response.status === 409) {
+                        return error
+                    }    
+                throw new Error(error.error)
+            }
+            
+            const data = await response.json()
+            if (data.success) {
+                addToast("success", data.success)
+            }
+            return data
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: patchEditUser, isLoading } = useMutation(patchEditMyUserRequest)
+
+    return { patchEditUser, isLoading }
+}
+
+export const usePatchEditMyUserProfilePic = () => {
+    const { addToast } = useToast()
+
+    const patchEditMyUserProfilePicRequest = async (inputs) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/my/user/edit/profile-picture`, {
+                method: "PATCH",
+                credentials: 'include',
+                body: inputs
+            })
+    
+            if (!response.ok) {  
+                throw new Error()
+            }
+            
+            const data = await response.json()
+            if (data.success) {
+                addToast("success", data.success)
+            }
+            return data
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: patchEditUserProfilePic, isLoading } = useMutation(patchEditMyUserProfilePicRequest)
+
+    return { patchEditUserProfilePic, isLoading }
 }
 
 export const useLoginMyUser = () => {

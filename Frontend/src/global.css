@@ -111,4 +111,43 @@
   }
 }
 
+/* Themes Gradient Colours */
+.instagram-gradient {
+  background: linear-gradient(45deg, 
+    #405DE6 0%,
+    #5B51D8 10%,
+    #833AB4 20%,
+    #C13584 30%,
+    #E1306C 40%,
+    #FD1D1D 50%,
+    #F56040 60%,
+    #FCAF45 80%,
+    #FFDC80 90%,
+    #5B51D8 100%);
+}
 
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+	width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+	background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #27272a;
+	border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #fff;
+  cursor: pointer;
+}
+
+/* Blur Effect */
+.backdrop-blur-custom {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
