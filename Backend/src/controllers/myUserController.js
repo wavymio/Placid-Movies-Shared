@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const { v2: cloudinary } = require('cloudinary')
 const User = require('../models/users')
+const { userSocketMap } = require('../socket/socket')
 const generateTokenAndSetCookie = require('../utils/generateToken')
 const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10)
 
@@ -103,13 +104,46 @@ const patchEditProfilePic = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const { userId } = req
-        const user = await User.findById(userId).select("-password")
+        const user = await User.findById(userId)
+            .select("-password")
+            .populate({
+                path: 'friends.userId',
+                select: 'username profilePicture',
+            })
+            .populate({
+                path: 'notifications',
+                populate: {
+                    path: 'from',
+                    select: 'username profilePicture'
+                },
+                options: { sort: { date: -1 } }
+            })
 
         if (!user) {
             return res.status(404).json({ error: "User not found" })
         }
 
-        return res.status(200).json( user )
+        const onlineFriends = []
+        const offlineFriends = []
+
+        user.friends.forEach((friend) => {
+            console.log(userSocketMap)
+            if (userSocketMap.get(friend.userId._id.toString())) {
+                console.log("on")
+                onlineFriends.push(friend)
+            } else {
+                console.log("off")
+                offlineFriends.push(friend)
+            }
+        })
+
+        const updatedUser = {
+            ...user.toObject(),
+            onlineFriends,
+            offlineFriends
+        }
+
+        return res.status(200).json( updatedUser )
     } catch (err) {
         console.log(err)
         res.status(500).json({ error: "Internal Server Error" })

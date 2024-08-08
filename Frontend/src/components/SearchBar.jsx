@@ -49,7 +49,7 @@ const SearchBar = () => {
                 </button>
             </form>
             {isLoading || isAuthLoading ? (
-                <div className={`mt-20 xs:mt-24 left-0 w-full z-40 shadow-lg px-7 sm:p-0 sm:z-5 sm:w-96  bg-black text-white absolute sm:right-0 sm:mt-2 transition-opacity duration-500 ease-in-out ${isLoading} ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+                <div className={`mt-20 xs:mt-24 left-0 w-full z-40 shadow-lg px-7 sm:p-0 sm:z-5 sm:w-96 rounded-lg bg-black text-white absolute sm:right-0 sm:mt-2 transition-opacity duration-500 ease-in-out ${isLoading} ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                     <div className='p-4 sm:p-3 border border-neutral-800 flex justify-center rounded-lg'>
                         <div className='loader'></div>
                     </div>

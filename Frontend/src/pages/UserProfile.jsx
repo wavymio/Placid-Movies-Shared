@@ -1,7 +1,7 @@
 import UserProfileRooms from '../components/UserProfileRooms'
 import UserProfileBio from '../components/UserProfileBio'
 import { useAuth } from '../contexts/AuthContext'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const UserProfile = () => {
     const { isLoading, loggedInUser } = useAuth()

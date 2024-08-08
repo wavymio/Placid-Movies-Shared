@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useGetUser } from '../api/UserApi'
 import { useAuth } from '../contexts/AuthContext'
-import React, { useEffect } from 'react'
-import UserProfile from './UserProfile'
+import React from 'react'
 import UserProfileBio from '../components/UserProfileBio'
 import UserProfileRooms from '../components/UserProfileRooms'
 
@@ -23,8 +22,8 @@ const OtherUserProfile = () => {
     
     return (
         <div className='w-full flex flex-col justify-center gap-9 sm:gap-14'>
-            <UserProfileBio user={user} sameUser={sameUser} />
-            <UserProfileRooms user={user} sameUser={sameUser} />
+            <UserProfileBio user={user} sameUser={sameUser} loggedInUser={loggedInUser} />
+            <UserProfileRooms user={user} sameUser={sameUser} loggedInUser={loggedInUser} />
         </div>
     )
 }
