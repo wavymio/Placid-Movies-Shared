@@ -354,7 +354,7 @@ const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
     }
 
     return (
-        <div ref={containerRef} className={`px-1 sm:px-0 h-[54vh] mt-1 xs:bg-black xs:h-[48vh] xs:w-full sm:pt-[10px] sm:pb-[95px] sm:bg-black sm:w-full sm:h-[80vh] sm:rounded-xl lg:bg-neutral-950 lg:w-1/3 lg:h-full lg:rounded-xl lg:pt-[50px] ${conversation.messages?.length < 1 ? 'flex justify-center' : 'flex flex-col'} relative `}>
+        <div ref={containerRef} className={`px-1 sm:px-0 h-[48vh] mt-1 xs:bg-black xs:h-[42vh] xs:w-full sm:pt-[10px] sm:pb-[95px] sm:bg-black sm:w-full sm:h-[80vh] sm:rounded-xl lg:bg-neutral-950 lg:w-1/3 lg:h-full lg:rounded-xl lg:pt-[50px] ${conversation.messages?.length < 1 ? 'flex justify-center' : 'flex flex-col'} relative `}>
             <div className='hidden lg:flex items-center pl-5 absolute top-0 left-0 gap-2 rounded-t-xl bg-neutral-900 w-full h-14'>
                 <div className='h-3 w-3 rounded-full bg-green-300'></div>
                 <div className='text-[13px] font-semibold'>{room.participants.length} participants online</div>

@@ -254,7 +254,7 @@ const MyRoom = ({ scrollToTop }) => {
         <>
             <div className='sm:block hidden' ref={roomPageStartRef}></div>
             <RoomSettingsPanel room={room} toggleRoomSettingsBar={toggleRoomSettingsBar} openRoomSettingsBar={openRoomSettingsBar} loggedInUser={loggedInUser} formatTime={formatTime} />
-            <div onClick={toggleRoomSettingsBar} className='h-12 w-12 top-[200px] xs:top-[230px] left-1 sm:top-1/2 sm:left-0 sm:h-16 sm:w-16 animate-spin cursor-pointer flex items-center justify-center rounded-full  absolute z-10 transition-transform duration-300 ease-in-out hover:scale-105 bg-transparent backdrop-filter backdrop-blur-lg shadow-lg'>
+            <div onClick={toggleRoomSettingsBar} className='h-12 w-12 left-1 top-1/2 sm:left-0 sm:h-16 sm:w-16 animate-spin cursor-pointer flex items-center justify-center rounded-full  absolute z-10 transition-transform duration-300 ease-in-out hover:scale-105 bg-transparent backdrop-filter backdrop-blur-lg shadow-lg'>
                 <FaGear
                     // style={{ fontSize: '20px' }}
                     className='h-[16px] w-[16px] sm:h-[20px] sm:w-[20px]'
@@ -271,7 +271,7 @@ const MyRoom = ({ scrollToTop }) => {
                 onMouseEnter={() => setIsVideoHovered(true)} 
                 onMouseMove={() => setIsVideoHovered(true)} 
                 onMouseLeave={() => setIsVideoHovered(false)} 
-                className='h-[30vh] w-full xs:h-[35vh] sm:w-full sm:h-[80vh] sm:rounded-xl lg:w-2/3 lg:h-full lg:rounded-xl relative bg-neutral-900'>
+                className='h-[24vh] w-full xs:h-[29vh] sm:w-full sm:h-[80vh] sm:rounded-xl lg:w-2/3 lg:h-full lg:rounded-xl relative bg-neutral-900'>
                     <video 
                     ref={videoRef} 
                     onChange={handlePlay}
