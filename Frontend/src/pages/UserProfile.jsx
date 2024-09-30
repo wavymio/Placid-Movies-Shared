@@ -10,7 +10,7 @@ const UserProfile = () => {
 
     if (isLoading) {
         return (
-            <div className='flex items-center justify-center h-screen w-full'>
+            <div className='overflow-y-hidden w-full h-[43vh] pb-2 flex justify-center items-center pt-[145px] lg:pt-[200px]'>
                 <div className='big-loader'></div>
             </div>
         )

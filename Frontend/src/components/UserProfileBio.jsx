@@ -105,8 +105,8 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
                     </div>
                     {sameUser? (
                         <>
-                            <Link to={'/edit-profile'} className={`cursor-pointer bg-red-900 hidden xs:flex justify-center whitespace-nowrap px-2 py-3 w-24 sm:px-2 sm:py-4 sm:w-28 rounded-lg font-semibold text-xs sm:text-sm hover:bg-red-950 transition-colors ease-in-out duration-300`}>Edit Profile</Link>
-                            <Link to={'/edit-profile'} className={`cursor-pointer bg-red-900 flex xs:hidden justify-center xs:whitespace-nowrap px-3 py-3 w-14 rounded-lg font-semibold text-xs sm:text-sm hover:bg-red-950 transition-colors ease-in-out duration-300`}>Edit</Link>
+                            <Link to={''} className={`cursor-pointer bg-red-900 hidden xs:flex justify-center whitespace-nowrap px-2 py-3 w-24 sm:px-2 sm:py-4 sm:w-28 rounded-lg font-semibold text-xs sm:text-sm hover:bg-red-950 transition-colors ease-in-out duration-300`}>Verify</Link>
+                            <Link to={''} className={`cursor-pointer bg-red-900 flex xs:hidden justify-center xs:whitespace-nowrap px-3 py-3 w-14 rounded-lg font-semibold text-xs sm:text-sm hover:bg-red-950 transition-colors ease-in-out duration-300`}>Verify</Link>
                         </>
                     ) : (
                         <>

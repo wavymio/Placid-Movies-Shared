@@ -326,7 +326,7 @@ const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
                     const containerRect = container.getBoundingClientRect()
                     
                     // if the message is visible, scroll to the bottom 
-                    if (top >= containerRect.top && bottom <= containerRect.bottom) {
+                    if (top >= containerRect.top && bottom <= containerRect.bottom+25) {
                         scrollToMessage(lastMessageIndex)
                     }
                 }
@@ -380,8 +380,8 @@ const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
                             key={index} 
                             className={`text-xs sm:text-sm flex items-end ${message?.senderId?._id === loggedInUser._id ? 'justify-end' : null} gap-3`}>
                                 {((message?.senderId?._id !== loggedInUser._id) && (message?.senderId?._id !== messages[(index + 1)]?.senderId?._id)) ? (
-                                    <div className={`max-h-10 max-w-10 xs:max-h-12 xs:max-w-12 p-1 rounded-full border ${getBorderColour(message?.senderId?._id)}`}>
-                                        <img src={message.senderId.profilePicture} className='object-cover rounded-full ' />
+                                    <div className={`h-10 w-10 xs:h-12 xs:w-12 p-1 rounded-full border ${getBorderColour(message?.senderId?._id)}`}>
+                                        <img src={message.senderId.profilePicture} className='h-full w-full object-cover rounded-full ' />
                                     </div>
                                 ) : (
                                     <div className='h-10 w-10 xs:h-12 xs:w-12 p-1 rounded-full border border-neutral-900 opacity-0'></div>

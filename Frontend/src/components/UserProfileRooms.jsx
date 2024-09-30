@@ -7,24 +7,24 @@ const UserProfileRooms = ({ user, sameUser }) => {
     const savedRooms = user?.savedRooms
     const favoriteRooms = user?.favoriteRooms
 
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth <= 640) {
-                setTab("saved")
-            }
-        }
+    // useEffect(() => {
+    //     const handleResize = () => {
+    //         if (window.innerWidth <= 640) {
+    //             setTab("saved")
+    //         }
+    //     }
 
-        // Check screen size on component mount
-        handleResize()
+    //     // Check screen size on component mount
+    //     handleResize()
 
-        // Add event listener for window resize
-        window.addEventListener('resize', handleResize)
+    //     // Add event listener for window resize
+    //     window.addEventListener('resize', handleResize)
 
-        // Clean up event listener on component unmount
-        return () => {
-            window.removeEventListener('resize', handleResize)
-        }
-    }, [])
+    //     // Clean up event listener on component unmount
+    //     return () => {
+    //         window.removeEventListener('resize', handleResize)
+    //     }
+    // }, [])
 
     const changeTabs = (tabName) => {
         setTab(tabName)
