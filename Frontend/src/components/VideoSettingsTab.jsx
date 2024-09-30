@@ -59,7 +59,7 @@ const VideoSettingsTab = ({ room, loggedInUser, formatTime }) => {
     }, [searchInput])
 
     return (
-        <div className='rounded-l-2xl sm:rounded-2xl overflow-y-scroll sm:overflow-auto w-[260px] xs:w-[350px] h-[380px] sm:h-auto sm:w-[450px] md:w-[550px] -mt-10 sm:mt-16 lg:mt-0 lg:w-[600px] px-0 xs:px-2 sm:px-8 py-8 relative bg-black border border-neutral-900 text-sm'>
+        <div className='rounded-l-2xl sm:rounded-2xl overflow-y-scroll sm:overflow-auto w-[260px] xs:w-[350px] h-[300px] sm:h-auto sm:w-[450px] md:w-[550px] -mt-10 sm:mt-16 lg:mt-0 lg:w-[600px] px-0 xs:px-2 sm:px-8 py-8 relative bg-black border border-neutral-900 text-sm'>
             {Array.from({ length: 3 }, (_, i) => i + 1).map((number, index) => (
                 <div key={index} className='z-10 bg-transparent backdrop-filter backdrop-blur-2xl shadow-lg absolute w-full h-screen sm:h-full top-0 left-0 rounded-xl'></div>
             ))}

@@ -71,7 +71,7 @@ const RoomInvitesTab = ({ room, loggedInUser }) => {
                     <IoCloseSharp />
                 </button>
             </div>
-            <div className='max-h-44 flex flex-wrap justify-center gap-1 overflow-y-scroll overflow-x-hidden'>
+            <div className='max-h-32 flex flex-wrap justify-center gap-1 overflow-y-scroll overflow-x-hidden'>
                 {room.invitedUsers.map((username, index) => (
                     <Link to={`/user/${username._id}`} key={index} className='cursor-pointer relative h-10 w-10 sm:h-14 sm:w-14 rounded-full hover:scale-105 transition-all ease-in-out duration-300'>
                         <img className='h-full w-full rounded-full object-cover' src={username.profilePicture} alt="picture" />
