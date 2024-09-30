@@ -271,7 +271,7 @@ const MyRoom = ({ scrollToTop }) => {
                 onMouseEnter={() => setIsVideoHovered(true)} 
                 onMouseMove={() => setIsVideoHovered(true)} 
                 onMouseLeave={() => setIsVideoHovered(false)} 
-                className='h-[24vh] w-full xs:h-[29vh] sm:w-full sm:h-[80vh] sm:rounded-xl lg:w-2/3 lg:h-full lg:rounded-xl relative bg-neutral-900'>
+                className='h-[26vh] w-full xs:h-[31vh] sm:w-full sm:h-[80vh] sm:rounded-xl lg:w-2/3 lg:h-full lg:rounded-xl relative bg-neutral-900'>
                     <video 
                     ref={videoRef} 
                     onChange={handlePlay}
