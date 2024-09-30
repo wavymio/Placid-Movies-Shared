@@ -7,7 +7,13 @@ const ProtectedRoute = () => {
     
     if (isLoading) {
         return (
-            <div className='loader'></div>
+            <div className='flex items-center justify-center w-full h-screen'>
+                <div className='flex flex-col items-center gap-5'>
+                    <div className='big-loader'></div>
+                    {/* <div className='text-xl font-heading font-bold text-white'>{` PLÂCID `}</div> */}
+                </div>
+                
+            </div>
         )
     }
 

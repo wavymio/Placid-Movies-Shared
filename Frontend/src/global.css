@@ -82,12 +82,52 @@
   vertical-align: middle;
 }
 
+.big-loader {
+  border: 4px solid #fff;
+  /* border-top: 4px solid #ffffff; */
+  border-radius: 10%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.bigger-loader {
+  border: 8px solid #fff;
+  /* border-top: 4px solid #ffffff; */
+  border-radius: 20%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.animate-spin {
+  animation: spin 3s linear infinite;
+}
+
+.animate-slide {
+  display: inline-block;
+  animation: slide 8s linear infinite;
+}
+
 @keyframes spin {
   0% {
       transform: rotate(0deg);
   }
   100% {
       transform: rotate(360deg);
+  }
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
   }
 }
 
@@ -150,4 +190,77 @@
 .backdrop-blur-custom {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+}
+
+/* transparent bg */
+.black-opacity {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Video Seekbar */
+.video-seekbar {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    outline: none;
+
+    border-radius: 30px;
+}
+
+.video-seekbar:hover {
+
+  cursor: pointer;
+}
+
+.video-seekbar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  background: white;
+  cursor: pointer;
+  border-radius: 0px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.video-seekbar.thumb-visible::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.video-seekbar.thumb-hidden::-webkit-slider-thumb {
+  opacity: 0;
+}
+
+.video-seekbar::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  background: white;
+  cursor: pointer;
+  border-radius: 0px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.video-seekbar.thumb-visible::-moz-range-thumb {
+  opacity: 1;
+}
+
+.video-seekbar.thumb-hidden::-moz-range-thumb {
+  opacity: 0;
+}
+
+/* Playing animation */
+.visualizer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bar {
+  width: 6px;
+  background-color: #fff;
+  transition: height 0.3s ease; /* Smooth height transition */
+  border-radius: 50px;
 }

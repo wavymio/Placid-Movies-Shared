@@ -8,6 +8,8 @@ import ProtectedRoute from './auth/ProtectedRoute'
 import AuthRoute from './auth/AuthRoute'
 import UserProfile from './pages/UserProfile'
 import OtherUserProfile from './pages/OtherUserProfile'
+import MyRoom from './pages/MyRoom'
+import MyVideos from './pages/MyVideos'
 
 const AppRoutes = () => {
     return (
@@ -41,6 +43,16 @@ const AppRoutes = () => {
                 <Route path='/user-profile' element={
                     <Layout>
                         <UserProfile />
+                    </Layout>
+                } />
+                <Route path='/room/:roomId' element={
+                    <Layout>
+                        <MyRoom />
+                    </Layout>
+                } />
+                <Route path='/my-videos' element={
+                    <Layout>
+                        <MyVideos />
                     </Layout>
                 } />
             </Route>

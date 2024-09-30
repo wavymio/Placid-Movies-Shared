@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { ToastProvider } from './contexts/ToastContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { SocketProvider } from './contexts/SocketContext'
+import { LoadingProvider } from './contexts/LoadingContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,17 +19,19 @@ const queryClient = new QueryClient({
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
         <AuthProvider>
           <SocketProvider>
-            <Router>
-              <AppRoutes />
-            </Router>
+            <LoadingProvider>
+              <Router>
+                <AppRoutes />
+              </Router>
+            </LoadingProvider>
           </SocketProvider>
         </AuthProvider>
       </ToastProvider>
     </QueryClientProvider>
-  </React.StrictMode>,
+  // </React.StrictMode>,
 )

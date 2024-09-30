@@ -6,9 +6,7 @@ import { useQueryClient } from 'react-query'
 import { useAcceptFriend, useAddFriend, useCancelFriend, useRejectFriend, useUnfriend } from '../api/UserApi'
 import { TiUserAdd } from "react-icons/ti"
 import { TiUserDelete } from "react-icons/ti"
-import { IoCloseSharp } from 'react-icons/io5'
 import FriendsTab from './FriendsTab'
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
     const queryClient = useQueryClient()
@@ -31,6 +29,7 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
     }
 
     const showFriends = () => {
+        if (user.friends.length < 1) return
         setOpenFriends(true)
     }
 
@@ -87,7 +86,7 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
                             <span className='loader'></span>
                         </div>
                     ) : (
-                        <input type='file' accept=".jpg, .jpeg, .png" onChange={handlePfpChange} className='absolute opacity-0 cursor-pointer top-0 h-28 w-28 xs:h-32 xs:w-32 sm:h-32 sm:w-32 md:h-44 md:w-44 rounded-full'/>
+                        <input type='file' accept="image/*" onChange={handlePfpChange} className='absolute opacity-0 cursor-pointer top-0 h-28 w-28 xs:h-32 xs:w-32 sm:h-32 sm:w-32 md:h-44 md:w-44 rounded-full'/>
                     )}
                 </div>
             ) : (
@@ -98,10 +97,10 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
 
             <div className='flex flex-col gap-3 xs:gap-5'>
                 <div className='flex items-center gap-3'>
-                    <div onClick={editUsername} className='cursor-pointer border border-neutral-800 bg-neutral-900 flex justify-center px-3 py-3 min-w-14 xs:px-2 xs:py-3 xs:min-w-20 sm:py-4 sm:w-24 md:px-2 md:py-4 md:min-w-28 rounded-lg font-semibold text-xs sm:text-sm hover:bg-neutral-800 transition-colors ease-in-out duration-300'>
-                        {user?.username}
+                    <div onClick={editUsername} className='overflow-hidden whitespace-nowrap cursor-pointer border border-neutral-800 bg-neutral-900 flex justify-center px-3 py-3 max-w-16 xs:px-2 xs:py-3 xs:min-w-20 sm:py-4 sm:w-24 md:px-2 md:py-4 md:min-w-28 rounded-lg font-semibold text-xs sm:text-sm hover:bg-neutral-800 transition-colors ease-in-out duration-300'>
+                        <div className={`${user?.username.length > 8 ? 'animate-slide' : null} px-3`}>{user?.username}</div>
                     </div>
-                    <div className='border border-neutral-800 bg-neutral-900 flex justify-center px-3 py-3 w-min-14 xs:px-2 xs:py-3 xs:min-w-20 sm:px-2 sm:py-4 sm:w-24 md:px-2 md:py-4 md:w-28 rounded-lg font-semibold text-xs sm:text-sm'>
+                    <div className='border border-neutral-800 bg-neutral-900 flex justify-center px-3 py-3 min-w-14 xs:px-2 xs:py-3 xs:min-w-20 sm:px-2 sm:py-4 sm:w-24 md:px-2 md:py-4 md:w-28 rounded-lg font-semibold text-xs sm:text-sm'>
                         Noob
                     </div>
                     {sameUser? (

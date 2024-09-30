@@ -15,7 +15,7 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['regular', 'friend-request', 'room-request'],
+        enum: ['regular', 'friend-request', 'room-request', 'room-invite'],
         default: 'regular',
     },
     link: {

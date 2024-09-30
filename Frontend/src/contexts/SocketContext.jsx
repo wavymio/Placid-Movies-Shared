@@ -10,12 +10,15 @@ export const SocketProvider = ({ children }) => {
     const socket = useRef(null)
     const { isLoggedIn, isLoading, loggedInUser } = useAuth()
     const [userId, setUserId] = useState(null)
+    const [isSocketLoading, setIsSocketLoading] = useState(false)
 
     useEffect(() => {
         if (loggedInUser?._id !== userId) {
             if (socket.current) {
                 socket.current.disconnect()
             }
+
+            setIsSocketLoading(true)
 
             socket.current = io(API_BASE_URL, {
                 withCredentials: true,
@@ -24,6 +27,7 @@ export const SocketProvider = ({ children }) => {
 
             socket.current.on("connect", () => {
                 console.log("Connected to socket server")
+                setIsSocketLoading(false)
             })
             setUserId(loggedInUser?._id)
 
@@ -33,12 +37,13 @@ export const SocketProvider = ({ children }) => {
                 if (socket.current) {
                     socket.current.disconnect()
                 }
+                setIsSocketLoading(false)
             }
         }
     }, [loggedInUser?._id]) //dependency array
 
     return (
-        <SocketContext.Provider value={socket.current}>
+        <SocketContext.Provider value={{ socket: socket.current, isSocketLoading }}>
             { children }
         </SocketContext.Provider>
     )

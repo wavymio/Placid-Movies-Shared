@@ -3,7 +3,7 @@ import React from 'react'
 import { useQueryClient } from 'react-query'
 import { Link } from 'react-router-dom'
 
-const RoomAndFriendRequestNotification = ({ notifType, notification, formatDate, loggedInUser }) => {
+const FriendRequestNotification = ({ notifType, notification, formatDate, loggedInUser }) => {
     const queryClient = useQueryClient()
     
     const { acceptFriendRequest, isLoading: isAcceptLoading } = useAcceptFriend()
@@ -53,4 +53,4 @@ const RoomAndFriendRequestNotification = ({ notifType, notification, formatDate,
     )
 }
 
-export default RoomAndFriendRequestNotification
+export default FriendRequestNotification

@@ -5,6 +5,10 @@ import { useQueryClient } from 'react-query'
 import { IoMdNotifications } from "react-icons/io"
 import Notifications from './Notifications'
 import { useMarkMyNotifications } from '../api/MyNotificationsApi'
+import { FaVideo } from 'react-icons/fa'
+import { BsPersonArmsUp } from 'react-icons/bs'
+import { FaPersonCane } from 'react-icons/fa6'
+import { IoLogOut } from 'react-icons/io5'
 
 const MainNav = ({ isLoggedIn, user, logout, isLoading, isAuthLoading }) => {
     const queryClient = useQueryClient()
@@ -76,9 +80,11 @@ const MainNav = ({ isLoggedIn, user, logout, isLoading, isAuthLoading }) => {
             <div className={`shadow-lg z-10 w-40 border border-gray-300 font-semibold bg-black text-white absolute right-0 mt-2 flex flex-col rounded-lg transition-opacity duration-500 ease-in-out ${profileDrop ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                 {isLoggedIn && user ? (
                     <>                     
-                        <Link onClick={handleLinkClick} to={'/user-profile'} className='px-4 pt-4 pb-4 cursor-pointer hover:bg-neutral-800 rounded-t-lg transition-colors duration-300 ease-in-out'>User Profile</Link>
+                        <Link onClick={handleLinkClick} to={'/user-profile'} className='px-4 pt-4 pb-4 cursor-pointer hover:bg-neutral-800 rounded-t-lg transition-colors duration-300 ease-in-out'><span className='flex items-center gap-2'>Profile <FaPersonCane /></span></Link>
                         <Separator className="bg-neutral-800" />
-                        <Link onClick={handleLogout} className={`px-4 pt-4 pb-4 ${isLoading ? 'flex justify-center' : null} cursor-pointer hover:bg-neutral-800 rounded-b-lg transition-colors duration-300 ease-in-out`}>{isLoading ? (<span className='loader'></span>) : 'Logout'}</Link>
+                        <Link onClick={handleLinkClick} to={'/my-videos'} className='px-4 pt-4 pb-4 cursor-pointer hover:bg-neutral-800 rounded-t-lg transition-colors duration-300 ease-in-out'><span className='flex items-center gap-2'>Videos <FaVideo /></span></Link>
+                        <Separator className="bg-neutral-800" />
+                        <Link onClick={handleLogout} className={`px-4 pt-4 pb-4 ${isLoading ? 'flex justify-center' : null} cursor-pointer hover:bg-neutral-800 rounded-b-lg transition-colors duration-300 ease-in-out`}>{isLoading ? (<span className='loader'></span>) : <span className='flex items-center gap-2'>Logout <IoLogOut /></span>}</Link>
                     </>
                 ) : (
                     <>

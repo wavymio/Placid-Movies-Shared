@@ -31,7 +31,7 @@ const FriendsTab = ({ sameUser, setOpenFriends, user, loggedInUser }) => {
                             <Link to={`/user/${friend.userId._id}`} className='relative bg-neutral-950 h-12 xs:h-16 rounded-l-full rounded-r-full flex items-center gap-3 cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out' key={index}>
                                 <div><img src={friend.userId.profilePicture} alt='img' className='object-cover h-12 w-12 xs:h-16 xs:w-16 rounded-full' /></div>
                                 <div className='text-sm xs:text-lg font-bold'>{friend.userId.username[0].toString().toUpperCase()+friend.userId.username.toString().slice(1)}</div>
-                                {loggedInUser._id === friend.userId._id &&
+                                {loggedInUser?._id === friend.userId._id &&
                                     <div className='absolute h-3 w-3 xs:h-3 xs:w-3 bottom-0 left-8 xs:left-12 border border-neutral-950 rounded-full bg-green-400'></div>
                                 }
                             </Link>

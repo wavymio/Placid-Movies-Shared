@@ -34,3 +34,72 @@ export const useSearchUsernamesAndRooms = () => {
         isLoading
     }
 }
+
+export const useSearchUsernameForInvite = () => {
+    const { addToast } = useToast()
+
+    const searchUsernameForInviteRequest = async (payload) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/search/username-for-invite`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(payload)
+            })
+    
+            if (!response.ok) {
+                const error = await response.json()
+                throw new Error(error.error)
+            }
+    
+            const data = await response.json()
+            return data
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: searchUsersForInvite, isLoading } = useMutation(searchUsernameForInviteRequest)
+
+    return {
+        searchUsersForInvite,
+        isLoading
+    }
+}
+
+export const useSearchForVideos = () => {
+    const { addToast } = useToast()
+
+    const searchForVideosRequest = async (searchInput) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/search/videos`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: 'include',
+                body: JSON.stringify({searchInput})
+            })
+    
+            if (!response.ok) {
+                const error = await response.json()
+                console.log(error)
+                throw new Error(error.error)
+            }
+    
+            const data = await response.json()
+            return data
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: searchForVideos, isLoading: isSearchForVideosLoading } = useMutation(searchForVideosRequest)
+
+    return {
+        searchForVideos,
+        isSearchForVideosLoading
+    }
+}

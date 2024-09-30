@@ -74,6 +74,24 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    receivedRoomInvites: [{ 
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        room: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Room'
+        }
+    }],
+    savedVideos: [{ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Video'
+    }],
+    downloads: [{ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Video'
+    }],
 })
 
 
@@ -81,6 +99,7 @@ userSchema.index({ username: 1 })
 userSchema.index({ email: 1 }) 
 userSchema.index({ sentFriendRequests: 1 }) 
 userSchema.index({ receivedFriendRequests: 1 }) 
+userSchema.index({ 'receivedRoomInvites.user': 1, 'receivedRoomInvites.room': 1 }) 
 userSchema.index({ friends: 1 }) 
 userSchema.index({ rooms: 1 }) 
 userSchema.index({ savedRooms: 1 }) 

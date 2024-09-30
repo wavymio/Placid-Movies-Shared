@@ -3,6 +3,7 @@ const { v2: cloudinary } = require('cloudinary')
 const User = require('../models/users')
 const { userSocketMap } = require('../socket/socket')
 const generateTokenAndSetCookie = require('../utils/generateToken')
+const uploadMedia = require('../utils/uploadMedia')
 const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10)
 
 const loginUser = async (req, res) => {
@@ -89,7 +90,7 @@ const patchEditProfilePic = async (req, res) => {
             return res.status(404).json({ error: "User not found" })
         }
 
-        const profilePicture = await uploadImage(req.file)
+        const profilePicture = await uploadMedia(req.file, "image")
 
         user.profilePicture = profilePicture
         await user.save()
@@ -118,6 +119,7 @@ const getUser = async (req, res) => {
                 },
                 options: { sort: { date: -1 } }
             })
+            .populate("rooms")
 
         if (!user) {
             return res.status(404).json({ error: "User not found" })
@@ -127,12 +129,9 @@ const getUser = async (req, res) => {
         const offlineFriends = []
 
         user.friends.forEach((friend) => {
-            console.log(userSocketMap)
             if (userSocketMap.get(friend.userId._id.toString())) {
-                console.log("on")
                 onlineFriends.push(friend)
             } else {
-                console.log("off")
                 offlineFriends.push(friend)
             }
         })
@@ -158,15 +157,6 @@ const logoutUser = async (req, res) => {
         console.log(err)
         return res.status(500).json({ error: "Internal Server Error" })
     }
-}
-
-const uploadImage = async (file) => {
-    const image = file
-    const base64Image = Buffer.from(image.buffer).toString("base64")
-    const dataURI = `data:${image.mimetype};base64,${base64Image}`
-
-    const uploadResponse = await cloudinary.uploader.upload(dataURI)
-    return uploadResponse.url
 }
 
 module.exports = {

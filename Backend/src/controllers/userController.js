@@ -12,6 +12,7 @@ const getUser = async (req, res) => {
             path: 'friends.userId',
             select: 'username profilePicture',
         })
+        .populate("rooms")
 
         if (!user) {
             return res.status(400).json({ error: "User not found" })
@@ -25,12 +26,12 @@ const getUser = async (req, res) => {
 }
 
 const sendFriendRequest = async (req, res) => {
+    const session = await mongoose.startSession()
+    session.startTransaction()
+
     try {
         const userSendingId = req.userId
         const userReceivingId = req.body.to
-
-        const session = await mongoose.startSession()
-        session.startTransaction()
 
         const userSending = await User.findById(userSendingId).select("-password").session(session)
         const userReceiving = await User.findById(userReceivingId).select("-password").session(session)
@@ -82,12 +83,12 @@ const sendFriendRequest = async (req, res) => {
 }
 
 const cancelFriendRequest = async (req, res) => {
+    const session = await mongoose.startSession()
+    session.startTransaction()
+
     try {
         const userSendingId = req.userId
         const userReceivingId = req.body.to
-
-        const session = await mongoose.startSession()
-        session.startTransaction()
 
         const userSending = await User.findById(userSendingId).select("-password").session(session)
         const userReceiving = await User.findById(userReceivingId).select("-password").session(session)
@@ -134,11 +135,11 @@ const cancelFriendRequest = async (req, res) => {
 
 const acceptFriendRequest = async (req, res) => {
     const session = await mongoose.startSession()
+    session.startTransaction()
+
     try {
         const userSendingId = req.userId
         const userReceivingId = req.body.to
-    
-        session.startTransaction()
     
         const userSending = await User.findById(userSendingId).select("-password").session(session)
         const userReceiving = await User.findById(userReceivingId).select("-password").session(session)
@@ -216,16 +217,16 @@ const acceptFriendRequest = async (req, res) => {
       console.log(err)
       return res.status(500).json({ error: "Internal Server Error" })
     }
-};
+}
   
 
 const rejectFriendRequest = async (req, res) => {
+    const session = await mongoose.startSession()
+    session.startTransaction()
+
     try {
         const userSendingId = req.userId
         const userReceivingId = req.body.to
-
-        const session = await mongoose.startSession()
-        session.startTransaction()
 
         const userSending = await User.findById(userSendingId).select("-password").session(session)
         const userReceiving = await User.findById(userReceivingId).select("-password").session(session)
@@ -275,12 +276,12 @@ const rejectFriendRequest = async (req, res) => {
 }
 
 const unfriendRequest = async (req, res) => {
+    const session = await mongoose.startSession()
+    session.startTransaction()
+
     try {
         const userSendingId = req.userId
         const userReceivingId = req.body.to
-
-        const session = await mongoose.startSession()
-        session.startTransaction()
 
         const userSending = await User.findById(userSendingId).select("-password").session(session)
         const userReceiving = await User.findById(userReceivingId).select("-password").session(session)

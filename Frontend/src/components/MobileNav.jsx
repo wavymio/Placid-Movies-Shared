@@ -4,9 +4,12 @@ import { Separator } from './ui/separator'
 import { useQueryClient } from 'react-query'
 import { IoLogOut } from "react-icons/io5"
 import { IoMdNotifications } from 'react-icons/io'
+import { BsPersonArmsUp } from "react-icons/bs"
 import Notifications from './Notifications'
 
 import { useMarkMyNotifications } from '../api/MyNotificationsApi'
+import { FaVideo } from 'react-icons/fa'
+import { FaPersonRifle } from 'react-icons/fa6'
 
 const MobileNav = ({ isLoggedIn, user, logout, isLoading, isAuthLoading }) => {
     const queryClient = useQueryClient()
@@ -76,7 +79,9 @@ const MobileNav = ({ isLoggedIn, user, logout, isLoading, isAuthLoading }) => {
                 <div className={`w-full flex flex-col`}>
                     {isLoggedIn && user ? (
                         <>
-                            <Link onClick={handleLinkClick} to={'/user-profile'} className='px-4 pt-4 pb-4 cursor-pointer hover:bg-neutral-800 rounded-t-lg transition-colors duration-300 ease-in-out'>Profile</Link>
+                            <Link onClick={handleLinkClick} to={'/user-profile'} className='px-4 pt-4 pb-4 cursor-pointer hover:bg-neutral-800 rounded-t-lg transition-colors duration-300 ease-in-out'><span className='flex items-center gap-2'>Profile <BsPersonArmsUp /></span></Link>
+                            <Separator className="bg-neutral-800" />
+                            <Link onClick={handleLinkClick} to={'/my-videos'} className='px-4 pt-4 pb-4 cursor-pointer hover:bg-neutral-800 rounded-t-lg transition-colors duration-300 ease-in-out'><span className='flex items-center gap-2'>Videos <FaVideo /></span></Link>
                             <Separator className="bg-neutral-800" />
                             <Link onClick={handleLogout} className='px-4 pt-4 pb-4 cursor-pointer hover:bg-neutral-800 rounded-b-lg transition-colors duration-300 ease-in-out'>{isLoading ? (<span className='loader'></span>) : (<span className='flex items-center gap-2'>Logout <IoLogOut /></span>)}</Link>
                         </>

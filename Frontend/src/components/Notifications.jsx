@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import SystemNotifications from './SystemNotifications'
-import RoomAndFriendRequestNotification from './RoomAndFriendRequestNotification'
 import { useAuth } from '../contexts/AuthContext'
 import { format, isToday, isYesterday, parseISO } from 'date-fns'
+import FriendRequestNotification from './FriendRequestNotification'
+import RoomRequestAndInviteNotification from './RoomRequestAndInviteNotification'
 
 const Notifications = ({ notifDrop }) => {
     const { loggedInUser } = useAuth()
@@ -26,7 +27,7 @@ const Notifications = ({ notifDrop }) => {
 
     const systemNotifications = loggedInUser?.notifications.filter((notification) => notification.type === "regular")
     const friendRequestNotifications = loggedInUser?.notifications.filter((notification) => notification.type === "friend-request")
-    const roomRequestNotifications = loggedInUser?.notifications.filter((notification) => notification.type === "room-request")
+    const roomNotifications = loggedInUser?.notifications.filter((notification) => notification.type === "room-request" || notification.type === "room-invite")
 
     return (
         <div className={`py-5 shadow-lg z-10 w-full xs:w-[310px] sm:w-[400px] h-96 border border-neutral-800 font-semibold bg-black text-white absolute right-0 mt-2 flex flex-col items-center rounded-lg transition-opacity duration-500 ease-in-out ${notifDrop ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
@@ -52,14 +53,14 @@ const Notifications = ({ notifDrop }) => {
             {tab === "friend" &&
                 <>
                 {friendRequestNotifications?.map((notification, index) => (
-                    <RoomAndFriendRequestNotification key={index} notifType={"friend"} notification={notification} formatDate={formatNotificationDate} loggedInUser={loggedInUser} />
+                    <FriendRequestNotification key={index} notifType={"friend"} notification={notification} formatDate={formatNotificationDate} loggedInUser={loggedInUser} />
                 ))}
                 </>
             }
             {tab === "room" &&
                 <>
-                {roomRequestNotifications?.map((notification, index) => (
-                    <RoomAndFriendRequestNotification key={index} notifType={"room"} notification={notification} formatDate={formatNotificationDate} loggedInUser={loggedInUser} />
+                {roomNotifications?.map((notification, index) => (
+                    <RoomRequestAndInviteNotification key={index} notifType={notification.type} notification={notification} formatDate={formatNotificationDate} loggedInUser={loggedInUser} />
                 ))}
                 </>
             }
