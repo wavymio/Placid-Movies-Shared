@@ -31,13 +31,13 @@ const VideoSettingsTab = ({ room, loggedInUser, formatTime }) => {
     }
 
     const handleChangeVideo = async (video, room) => {
-        if (!video._id) return
-        if (!room._id) return
+        if (!video?._id) return
+        if (!room?._id) return
         if ((room.owner.every(owner => owner._id !== loggedInUser._id)) && (room.admins.every(admin => admin._id !== loggedInUser._id))) return
         if (isChangeRoomVideoLoading) return
-        if (video._id === room.video._id) return
+        if (video?._id === room.video?._id) return
 
-        setSelectedVideo(video._id)
+        setSelectedVideo(video?._id)
 
         const payload = {
             roomId: room._id,
@@ -81,7 +81,7 @@ const VideoSettingsTab = ({ room, loggedInUser, formatTime }) => {
                 
                 <Separator className={'bg-neutral-800 mt-5'} />
                 
-                {(!room.video || room.video.length < 1) ? (
+                {(!room.video || room.video?.length < 1) ? (
                     <div className='py-5 flex flex-col items-center justify-center gap-4'>
                         <div className='h-[80px] w-[80px] bg-neutral-900 border border-white rounded-full flex items-center justify-center'>
                             <FaVideoSlash style={{ fontSize: '25px' }} />
@@ -91,7 +91,7 @@ const VideoSettingsTab = ({ room, loggedInUser, formatTime }) => {
                 ) : (
                     <div className='py-5 flex flex-col items-center gap-8 sm:gap-2'>
                         <div className='relative h-32 w-32'>
-                            <img className='h-full w-full rounded-xl object-cover' src={room.video.coverPhoto} alt="image" />
+                            <img className='h-full w-full rounded-xl object-cover' src={room.video?.coverPhoto} alt="image" />
                             {isChangeRoomVideoLoading && (
                                 <div className='absolute z-10 top-0 left-0 flex items-center justify-center black-opacity h-full w-full rounded-xl'>
                                     <div className='loader'></div>
@@ -101,14 +101,14 @@ const VideoSettingsTab = ({ room, loggedInUser, formatTime }) => {
                                 <AudioVisualiser />
                             </div>
                         </div>
-                        <div className='w-full text-xs xs:text-sm flex items-center justify-center xs:pl-5 sm:pl-0'>{room.video.name}</div>
+                        <div className='w-full text-xs xs:text-sm flex items-center justify-center xs:pl-5 sm:pl-0'>{room.video?.name}</div>
                     </div>
                 )}
 
                 {searchInput && (
                     <>
                         {isSearchForVideosLoading ? (
-                            <div className={`mt-6 sm:mt-24 left-0 top-10 w-full z-10 shadow-lg px-7 sm:p-0 sm:z-5 sm:w-full rounded-lg bg-black text-white absolute sm:right-0 sm:mt-2 transition-opacity duration-500 ease-in-out ${isSearchForVideosLoading} ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+                            <div className={`mt-6 left-0 top-10 w-full z-10 shadow-lg px-7 sm:p-0 sm:z-5 sm:w-full rounded-lg bg-black text-white absolute sm:right-0 sm:mt-2 transition-opacity duration-500 ease-in-out ${isSearchForVideosLoading} ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
                                 <div className='p-4 sm:p-3 border border-neutral-800 flex justify-center rounded-lg'>
                                     <div className='loader'></div>
                                 </div>
@@ -119,7 +119,7 @@ const VideoSettingsTab = ({ room, loggedInUser, formatTime }) => {
                                     {videos?.length > 0 ? (
                                         videos?.map((video, index) => (
                                             <div onClick={() => handleChangeVideo(video, room)} key={index} className={`relative transition-colors duration-300 ease-in-out ${isChangeRoomVideoLoading ? 'bg-neutral-900' : null} hover:bg-neutral-900  ${index === 0 && (videos?.length < 3) ? 'rounded-t-lg' : null} ${(index === videos?.length-1) && (videos?.length < 3) ? 'rounded-b-lg' : null}`}>
-                                                {video._id === room.video._id && (
+                                                {video._id === room.video?._id && (
                                                     <div className={`absolute black-opacity top-0 left-0 w-full h-full ${index === 0 && (videos?.length < 3) ? 'rounded-t-lg' : null} ${(index === videos?.length-1) && (videos?.length < 3) ? 'rounded-b-lg' : null}`}></div> 
                                                 )}
                                                 <div className={`px-4 pt-4 pb-4 ${(room.owner.every(owner => owner._id !== loggedInUser._id)) && (room.admins.every(admin => admin._id !== loggedInUser._id)) ? null :'cursor-pointer'} flex flex-col gap-2 text-sm ${index !== 0 ? null : 'rounded-t-lg'} ${index === videos.length-1 ? 'rounded-b-lg' : null}`}>
