@@ -198,7 +198,7 @@ const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
 
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
-          handleSubmit()
+          handleSubmit(event)
         }
     }
 
