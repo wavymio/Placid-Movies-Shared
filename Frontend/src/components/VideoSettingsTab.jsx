@@ -115,7 +115,7 @@ const VideoSettingsTab = ({ room, loggedInUser, formatTime }) => {
                             </div>
                         ) : (
                             <div className={`bg-transparent max-h-[200px] sm:max-h-[270px] rounded-lg left-0 top-10 w-full shadow-lg z-10 px-7 sm:p-0 sm:z-5 sm:w-full bg-black text-white absolute sm:right-0 mt-4 sm:mt-2 transition-opacity duration-500 ease-in-out ${videos ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-                                <div className={`${videos?.length > 2 ? 'overflow-y-scroll' : 'null'} sm:${videos?.length > 3 ? 'overflow-y-scroll' : 'null'} max-h-[200px] sm:max-h-[270px] bg-black rounded-lg border w-full border-neutral-800 flex flex-col`} >
+                                <div className={`${videos?.length > 1 ? 'overflow-y-scroll' : 'null'} sm:${videos?.length > 3 ? 'overflow-y-scroll' : 'null'} max-h-[200px] sm:max-h-[270px] bg-black rounded-lg border w-full border-neutral-800 flex flex-col`} >
                                     {videos?.length > 0 ? (
                                         videos?.map((video, index) => (
                                             <div onClick={() => handleChangeVideo(video, room)} key={index} className={`relative transition-colors duration-300 ease-in-out ${isChangeRoomVideoLoading ? 'bg-neutral-900' : null} hover:bg-neutral-900  ${index === 0 && (videos?.length < 3) ? 'rounded-t-lg' : null} ${(index === videos?.length-1) && (videos?.length < 3) ? 'rounded-b-lg' : null}`}>

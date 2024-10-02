@@ -7,13 +7,14 @@ const RoomRequestAndInviteNotification = ({ notifType, notification, formatDate,
     const { socket } = useSocket()
     const { isRedirectLoading, setIsRedirectLoading } = useLoading()
     const [isRejectLoading, setIsRejectLoading] = useState(false)
+    const [selectedNotificationId, setSelectedNotificationId] = useState(null)
     
     const formattedDate = formatDate(notification.date)
     const isInviteActive = loggedInUser.receivedRoomInvites.some((invite) => {
         return invite.user === notification.from._id && invite.room === notification.link.split('room/')[1]
     })
 
-    const handleRoomRequests = async ( ev, requestType ) => {
+    const handleRoomRequests = async ( ev, requestType, notificationId ) => {
         ev.preventDefault()
 
         if (requestType === "join") {
@@ -21,6 +22,7 @@ const RoomRequestAndInviteNotification = ({ notifType, notification, formatDate,
             socket.emit("joinRoom", {
                 roomId: notification.link.split('room/')[1]
             })
+            setSelectedNotificationId(notificationId)
             setIsRedirectLoading(true)
         }
     }
@@ -30,15 +32,15 @@ const RoomRequestAndInviteNotification = ({ notifType, notification, formatDate,
             <div className='break-words text-start tracking-wide'>{notification?.text.charAt(0).toUpperCase() + notification?.text.slice(1)}</div>
             {isInviteActive &&
                 <div className='mt-2 mb-2 w-full flex items-center gap-2 justify-center'>
-                    <button disabled={isRedirectLoading} onClick={(ev) => handleRoomRequests(ev, "join")} className={`min-w-20 xs:min-w-20 bg-neutral-950 hover:bg-black p-3 xs:p-3 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 font-bold`}>
-                        {isRedirectLoading ? (
+                    <button disabled={isRedirectLoading} onClick={(ev) => handleRoomRequests(ev, "join", notification?._id)} className={`min-w-20 xs:min-w-20 bg-neutral-950 hover:bg-black p-3 xs:p-3 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 font-bold`}>
+                        {(isRedirectLoading && (selectedNotificationId === notification?._id)) ? (
                             <span className='loader'></span>
                         ) : (
                             <span>Join</span>
                         )}
                     </button>
-                    <button disabled={isRejectLoading} onClick={(ev) => handleFriendRequests(ev, "reject")} className={`min-w-20 xs:min-w-20 bg-red-950 hover:bg-red-900 p-3 xs:p-3 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 font-bold`}>
-                        {isRejectLoading ? (
+                    <button disabled={isRejectLoading} onClick={(ev) => handleRoomRequests(ev, "reject", notification._id)} className={`min-w-20 xs:min-w-20 bg-red-950 hover:bg-red-900 p-3 xs:p-3 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 font-bold`}>
+                        {(isRejectLoading && (selectedNotificationId === notification?._id)) ? (
                             <span className='loader'></span>
                         ) : (
                             <span>Reject</span>
