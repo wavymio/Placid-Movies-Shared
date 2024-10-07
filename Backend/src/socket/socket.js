@@ -61,7 +61,7 @@ io.on("connection", async (socket) => {
         return
     }
 
-    const user = await User.findById(userId)
+    // const user = await User.findById(userId)
 
     socket.on("joinRoom", async ({ roomId }) => {
         console.log("hit")
@@ -226,6 +226,126 @@ io.on("connection", async (socket) => {
             return
         }
 
+    })
+
+    socket.on("playVideo", async ({ roomId, currentTime }) => {
+        if (!roomId) {
+            console.error("Invalid roomId provided")
+            return
+        }
+
+        try {
+            const room = await Room.findById(roomId)
+            const user = await User.findById(userId)
+
+            if (!room || !user) {
+                console.log("no room or user provided")
+                return
+            }
+
+            if (!room.owner.includes(userId) && !room.admins.includes(userId)) {
+                console.log("you ain't an admin nigga")
+                return
+            }
+
+            room.isPlaying = true
+            room.currentTime = currentTime
+            room.lastUpdated = Date.now()
+            await room.save()
+
+            return io.to(roomId).emit('playingTheVideo', { user, currentTime })
+        } catch (err) {
+            console.log(err)
+            return
+        }
+    })
+
+    socket.on("pauseVideo", async ({ roomId, currentTime }) => {
+        if (!roomId) {
+            console.error("Invalid roomId provided")
+            return
+        }
+
+        try {
+            const room = await Room.findById(roomId)
+            const user = await User.findById(userId)
+
+            if (!room || !user) {
+                console.log("no room or user provided")
+                return
+            }
+
+            if (!room.owner.includes(userId) && !room.admins.includes(userId)) {
+                console.log("you ain't an admin nigga")
+                return
+            }
+
+            room.isPlaying = false
+            room.currentTime = currentTime
+            room.lastUpdated = Date.now()
+            await room.save()
+
+            return io.to(roomId).emit('pausingTheVideo', { user, currentTime })
+        } catch (err) {
+            console.log(err)
+            return
+        }
+    })
+
+    socket.on("seekVideo", async ({ roomId , seekTime }) => {
+        if (!roomId) {
+            console.error("Invalid roomId provided")
+            return
+        }
+
+        try {
+            const room = await Room.findById(roomId)
+            const user = await User.findById(userId)
+
+            if (!room || !user) {
+                console.log("no room or user provided")
+                return
+            }
+
+            if (!room.owner.includes(userId) && !room.admins.includes(userId)) {
+                console.log("you ain't an admin nigga")
+                return
+            }
+
+            room.currentTime = seekTime
+            room.lastUpdated = Date.now()
+            await room.save()
+
+            return io.to(roomId).emit('seekingTheVideo', { user, seekTime })
+        } catch (err) {
+            console.log(err)
+            return
+        }
+    })
+
+    socket.on("syncVideo", async ({ roomId }) => {
+        if (!roomId) {
+            console.error("Invalid roomId provided")
+            return
+        }
+
+        try {
+            const room = await Room.findById(roomId)
+            const user = await User.findById(userId)
+
+            if (!room || !user) {
+                console.log("no room or user provided")
+                return
+            }
+
+            const currentTime = room.currentTime
+            const lastUpdated = room.lastUpdated
+
+            return io.to(roomId).emit('syncingTheVideo', { currentTime, lastUpdated })
+        } catch (err) {
+            console.log(err)
+            return
+        }
     })
 
     socket.on("disconnect", async () => {

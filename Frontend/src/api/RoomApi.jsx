@@ -29,7 +29,12 @@ export const useGetRoom = (roomId) => {
         }
     }
 
-    const { data: room, isLoading: isGetRoomLoading } = useQuery('getRoom', getRoomRequest)
+    // const { data: room, isLoading: isGetRoomLoading } = useQuery('getRoom', getRoomRequest)
+    const { data: room, isLoading: isGetRoomLoading } = useQuery(
+        ['getRoom', roomId], 
+        getRoomRequest,
+        { enabled: !!roomId } // only fetch if roomId is available
+    )
     
     return { room, isGetRoomLoading }
 }

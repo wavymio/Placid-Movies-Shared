@@ -301,6 +301,9 @@ const changeVideo = async (req, res) => {
         }
 
         room.video = videoId
+        room.currentTime = 0
+        room.isPlaying = false
+        room.lastUpdated = Date.now()
         const updatedRoom = await room.save()
 
         if (updatedRoom) {

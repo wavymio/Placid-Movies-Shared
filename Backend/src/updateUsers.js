@@ -5,24 +5,66 @@ const Notification = require('./models/notifications');
 const Room = require('./models/rooms'); // Adjust the path to where your Room model is located
 const Video = require('./models/videos');
 
-const updateRoomsSchema = async () => {
+const updateRooms = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+        })
+
+        const roomsToUpdate = await Room.find({
+            lastUpdated: { $type: "date" } // Checking for incorrect value types
         });
 
-        // Sync indexes with the updated schema
-        await Video.syncIndexes();
-        console.log('Indexes synchronized successfully.');
+        if (roomsToUpdate.length > 0) {
+            console.log(`Found ${roomsToUpdate.length} rooms with invalid lastUpdated field.`);
 
-    } catch (err) {
-        console.error('Error updating rooms schema:', err);
+            // Update each room's lastUpdated to the correct value
+            for (const room of roomsToUpdate) {
+                room.lastUpdated = Date.now(); // Set to the current timestamp
+                await room.save();
+                console.log(`Updated room ${room._id} with the correct lastUpdated.`);
+            }
+        } else {
+            console.log('No rooms found with invalid lastUpdated field.');
+        }
+
+        // Sync indexes with the updated schema
+        await Room.syncIndexes();
+        console.log('Indexes synchronized successfully.');
+    } catch (error) {
+        console.error('Error updating rooms:', error);
     } finally {
-        await mongoose.disconnect();
+        // Close the connection after the update
+        mongoose.connection.close();
     }
 };
 
+// Run the update script
+updateRooms();
+
+// const updateRooms = async () => {
+//     try {
+//         await mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
+//             useNewUrlParser: true,
+//             useUnifiedTopology: true,
+//         })
+
+//         // Update all existing rooms to add the `isPlaying` field with a default value of false
+//         const result = await Room.updateMany({}, { $set: { lastUpdated: new Date() } });
+        
+//         console.log(`${result.nModified} rooms updated successfully.`);
+//     } catch (error) {
+//         console.error('Error updating rooms:', error);
+//     } finally {
+//         // Close the connection after the update
+//         mongoose.connection.close();
+//     }
+// };
+
+// // Run the update script
+// updateRooms();
+
 // const updateRoomsSchema = async () => {
 //     try {
 //         await mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
@@ -30,16 +72,8 @@ const updateRoomsSchema = async () => {
 //             useUnifiedTopology: true,
 //         });
 
-//         // Update all existing rooms to add the 'privacy' field with a default value of 'public'
-//         await Room.updateMany(
-//             { privacy: { $exists: false } },  // Only update rooms that don't have the 'privacy' field
-//             { $set: { privacy: 'public' } }   // Set the default value for 'privacy'
-//         );
-
-//         console.log('Existing rooms updated successfully.');
-
 //         // Sync indexes with the updated schema
-//         await Room.syncIndexes();
+//         await Video.syncIndexes();
 //         console.log('Indexes synchronized successfully.');
 
 //     } catch (err) {
@@ -75,7 +109,33 @@ const updateRoomsSchema = async () => {
 //     }
 // };
 
-updateRoomsSchema();
+// const updateRoomsSchema = async () => {
+//     try {
+//         await mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
+//             useNewUrlParser: true,
+//             useUnifiedTopology: true,
+//         });
+
+//         // Update all existing rooms to add the 'privacy' field with a default value of 'public'
+//         await Room.updateMany(
+//             { privacy: { $exists: false } },  // Only update rooms that don't have the 'privacy' field
+//             { $set: { privacy: 'public' } }   // Set the default value for 'privacy'
+//         );
+
+//         console.log('Existing rooms updated successfully.');
+
+//         // Sync indexes with the updated schema
+//         await Room.syncIndexes();
+//         console.log('Indexes synchronized successfully.');
+
+//     } catch (err) {
+//         console.error('Error updating rooms schema:', err);
+//     } finally {
+//         await mongoose.disconnect();
+//     }
+// };
+
+// updateRoomsSchema();
 
 
 // async function syncIndexes() {

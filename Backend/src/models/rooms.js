@@ -58,6 +58,18 @@ const roomSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    isPlaying: {
+        type: Boolean,
+        default: false
+    },
+    currentTime: {
+        type: Number,
+        default: 0
+    },
+    lastUpdated: {
+        type: Date,
+        default: Date.now()
+    },
     createdAt: {
         type: Date, 
         default: Date.now 

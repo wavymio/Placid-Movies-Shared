@@ -82,7 +82,7 @@ const EditRoomTab = ({ room, loggedInUser }) => {
                 <div className='xs:w-2/6 xs:flex xs:flex-row xs:justify-left'>
                     <div className={`relative ${getRoomTheme(theme)} p-1 w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full cursor-pointer`}>
                         <img src={roomCoverPreview || `https://via.placeholder.com/150`} className='object-cover w-full h-full rounded-full hover:scale-105 transition-all duration-300 ease-in-out' alt="room cover" />
-                        {room.admins.includes(loggedInUser._id) || room.owner.includes(loggedInUser._id) ? (
+                        {(room.owner.some((owner) => owner._id === loggedInUser._id) || room.admins.some((owner) => owner._id === loggedInUser._id)) ? (
                             <>
                             {isCoverPicLoading ? (
                                 <div className='absolute top-0 left-0 w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full black-opacity flex items-center justify-center'>

@@ -1,6 +1,6 @@
 import { useAuth } from '../contexts/AuthContext'
 import Header from '../components/Header'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useToast } from '../contexts/ToastContext'
 import { useSocket } from '../contexts/SocketContext'
@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useLoading } from '../contexts/LoadingContext'
 
 const Layout = ({ children }) => {
-    const { roomId } = useParams()
+    const { roomId: gottenRoomId } = useParams()
     const queryClient = useQueryClient()
     const navigate = useNavigate()
     const { isLoading: isAuthLoading, loggedInUser } = useAuth()
@@ -16,10 +16,17 @@ const Layout = ({ children }) => {
     const { socket } = useSocket()
     const { isRedirectLoading, setIsRedirectLoading } = useLoading()
     const topGRef = useRef(null)
+    const [ roomId, setRoomId ] = useState(null)
 
     const scrollToTop = () => {
         topGRef.current?.scrollIntoView({ behavior: "smooth" })
     }
+
+    useEffect(() => {
+        if (gottenRoomId) {
+            setRoomId(gottenRoomId)
+        }
+    }, [gottenRoomId])
 
     useEffect(() => {
         console.log(roomId)
@@ -73,9 +80,10 @@ const Layout = ({ children }) => {
 
             const handleUserJoined = async (data) => {
                 await queryClient.invalidateQueries('validateUser')
-                await queryClient.invalidateQueries('getRoom')
+                await queryClient.invalidateQueries(['getRoom', roomId])
+                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.user._id) {
-                    addToast("success", `Welcome, ${data.user.username}`)
+                    addToast("success", `Welcome btc, ${data.user.username}`)
                 } else {
                     addToast("success", `${data.user.username} joined the room`)
                 }
@@ -86,12 +94,15 @@ const Layout = ({ children }) => {
             }
 
             const handleUserLeft = async (data) => {
-                await queryClient.invalidateQueries('getRoom')
+                await queryClient.invalidateQueries(['getRoom', roomId])
+                // await queryClient.invalidateQueries('getRoom')
                 addToast("success", `${data.user.username} left the room`)
             }
 
             const handleRoomUpdated = async (data) => {
-                await queryClient.invalidateQueries('getRoom')
+                console.log(roomId)
+                await queryClient.invalidateQueries(['getRoom', roomId])
+                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.user._id) {
                     addToast("success", "Room Updated")
                 } else {
@@ -105,7 +116,8 @@ const Layout = ({ children }) => {
             }
 
             const handleVideoChanged = async (data) => {
-                await queryClient.invalidateQueries('getRoom')
+                await queryClient.invalidateQueries(['getRoom', roomId])
+                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.user._id) {
                     addToast("success", "Video Changed!")
                 } else {
@@ -114,11 +126,13 @@ const Layout = ({ children }) => {
             }
 
             const handleUserInvited = async (data) => {
-                await queryClient.invalidateQueries('getRoom')
+                await queryClient.invalidateQueries(['getRoom', roomId])
+                // await queryClient.invalidateQueries('getRoom')
             }
 
             const handleAdminPromoted = async (data) => {
-                await queryClient.invalidateQueries('getRoom')
+                await queryClient.invalidateQueries(['getRoom', roomId])
+                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.participant._id) {
                     addToast("success", `You have been promoted by ${data.user.username}`)
                 } else {
@@ -127,7 +141,8 @@ const Layout = ({ children }) => {
             }
 
             const handleAdminDemoted = async (data) => {
-                await queryClient.invalidateQueries('getRoom')
+                await queryClient.invalidateQueries(['getRoom', roomId])
+                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.participant._id) {
                     addToast("success", `${data.user.username} has made you a peasant`)
                 } else {
@@ -177,7 +192,7 @@ const Layout = ({ children }) => {
                 socket.off("demotedAdmin", handleAdminDemoted)                
             }
         }
-    }, [socket])
+    }, [socket, roomId])
 
     if (isAuthLoading) {
         return <div className='flex items-center justify-center h-screen w-screen'><div className='big-loader'></div></div>
