@@ -197,6 +197,10 @@
   background: rgba(0, 0, 0, 0.4);
 }
 
+.blacker-opacity {
+  background: rgba(0, 0, 0, 0.7);
+}
+
 /* Video Seekbar */
 .video-seekbar {
     -webkit-appearance: none;

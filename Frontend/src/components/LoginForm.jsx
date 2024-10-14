@@ -35,6 +35,10 @@ const LoginForm = ({ buttonText, bottomText, bottomLinkText, bottomLink, handleL
                 }
                 setPasswordError("")
                 return 
+            } else if (inputs.username > 28) {
+                setUsernameError("Username is too Long")
+                setPasswordError("")
+                return
             } else if (inputs.username && !inputs.password) {
                 setUsernameError("")
                 setPasswordError("Please choose a password")

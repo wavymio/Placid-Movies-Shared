@@ -6,6 +6,7 @@ import { useToast } from '../contexts/ToastContext'
 import { useSocket } from '../contexts/SocketContext'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLoading } from '../contexts/LoadingContext'
+import { usePlayPause } from '../contexts/PlayPauseContext'
 
 const Layout = ({ children }) => {
     const { roomId: gottenRoomId } = useParams()
@@ -15,6 +16,7 @@ const Layout = ({ children }) => {
     const { addToast } = useToast()
     const { socket } = useSocket()
     const { isRedirectLoading, setIsRedirectLoading } = useLoading()
+    const { playPause, setPlayPause } = usePlayPause()
     const topGRef = useRef(null)
     const [ roomId, setRoomId ] = useState(null)
 
@@ -25,11 +27,14 @@ const Layout = ({ children }) => {
     useEffect(() => {
         if (gottenRoomId) {
             setRoomId(gottenRoomId)
+        } else {
+            setPlayPause({})
         }
     }, [gottenRoomId])
 
     useEffect(() => {
         console.log(roomId)
+        if (!roomId) setPlayPause({})
         if (socket) {
             const handleErrorNotification = (data) => {
                 addToast("error", data.error)
@@ -79,14 +84,14 @@ const Layout = ({ children }) => {
             }
 
             const handleUserJoined = async (data) => {
-                await queryClient.invalidateQueries('validateUser')
+                // await queryClient.invalidateQueries('validateUser')
                 await queryClient.invalidateQueries(['getRoom', roomId])
                 // await queryClient.invalidateQueries('getRoom')
-                if (loggedInUser._id === data.user._id) {
-                    addToast("success", `Welcome btc, ${data.user.username}`)
-                } else {
-                    addToast("success", `${data.user.username} joined the room`)
-                }
+                // if (loggedInUser._id === data.user._id) {
+                //     addToast("success", `Welcome btc, ${data.user.username}`)
+                // } else {
+                //     addToast("success", `${data.user.username} joined the room`)
+                // }
                 if (!sessionStorage.getItem(`userIsRejoining-${roomId}`)) {
                     navigate(`/room/${data.room._id}`)
                 }
@@ -150,6 +155,14 @@ const Layout = ({ children }) => {
                 }
             }
 
+            const handlePlayingTheVideo = ({ user, currentTime }) => {
+                setPlayPause(prev => {return {user, currentTime, isPlaying: true}})
+            }
+
+            const handlePausingTheVideo = ({ user, currentTime }) => {
+                setPlayPause(prev => {return {user, currentTime, isPlaying: false}})
+            }
+
             socket.on("errorNotification", handleErrorNotification)
 
             socket.on("friendRequestReceived", handleFriendRequestReceived)
@@ -170,6 +183,9 @@ const Layout = ({ children }) => {
             socket.on("promotedAdmin", handleAdminPromoted)
             socket.on("demotedAdmin", handleAdminDemoted)
 
+            socket.on("playingTheVideo", handlePlayingTheVideo)
+            socket.on("pausingTheVideo", handlePausingTheVideo)
+
             return () => {
                 socket.off("errorNotification", handleErrorNotification)
 
@@ -189,7 +205,10 @@ const Layout = ({ children }) => {
                 socket.off("videoChanged", handleVideoChanged)
                 socket.off("userInvited", handleUserInvited)
                 socket.off("promotedAdmin", handleAdminPromoted)
-                socket.off("demotedAdmin", handleAdminDemoted)                
+                socket.off("demotedAdmin", handleAdminDemoted)            
+                
+                socket.off("playingTheVideo", handlePlayingTheVideo)
+                socket.off("pausingTheVideo", handlePausingTheVideo)
             }
         }
     }, [socket, roomId])

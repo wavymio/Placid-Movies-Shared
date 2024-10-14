@@ -1,8 +1,10 @@
+import { usePlayPause } from '../contexts/PlayPauseContext'
 import { useToast } from '../contexts/ToastContext'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCompress, FaDownload, FaEdit, FaExpand, FaPause, FaPlay, FaUsers, FaVideo, FaVideoSlash, FaVolumeDown, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 
 const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, loggedInUser, socket }) => {
+    const { playPause } = usePlayPause()
     const [isVideoNotPlaying, setIsVideoNotPlaying] = useState(true)
     const [toggleVolume, setToggleVolume] = useState(true)
     const [currentTime, setCurrentTime] = useState(0)
@@ -217,23 +219,99 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
             // Create a local object URL for the blob
             const blobUrl = window.URL.createObjectURL(blob)
     
-            // Create a download link
-            const link = document.createElement('a')
-            link.href = blobUrl
-            link.setAttribute('download', room?.video?.name || 'video.mp4')
-    
-            // Trigger download
-            document.body.appendChild(link)
-            link.click()
-    
-            // Clean up
-            document.body.removeChild(link)
+            // For mobile devices, open in a new tab
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+            if (isMobile) {
+                window.open(blobUrl, '_blank') // Open in a new tab for mobile
+            } else {
+                // For desktop, create a download link
+                const link = document.createElement('a')
+                link.href = blobUrl
+                link.setAttribute('download', room?.video?.name || 'video.mp4')
+        
+                // Trigger download
+                document.body.appendChild(link)
+                link.click()
+        
+                // Clean up
+                document.body.removeChild(link)
+            }
+            
             window.URL.revokeObjectURL(blobUrl)
         } catch (err) {
             console.error("Error downloading the video:", err)
             addToast("error", "Download Failed")
         }
     }
+
+    const handlePlayingTheVideo = (user, currentTime) => {
+        videoRef.current.currentTime = currentTime
+        setCurrentTime(currentTime)
+        updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
+        setIsVideoNotPlaying(false)
+        videoRef.current.play()
+        setIsPlayLoading(false)
+        if (loggedInUser._id === user._id) {
+            addToast("success", `video playing`)
+        } else {
+            addToast("success", `${user.username} played the video`)
+        }
+    }
+
+    const handlePausingTheVideo = (user, currentTime) => {
+        videoRef.current.currentTime = currentTime
+        setCurrentTime(currentTime)
+        updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
+        setIsVideoNotPlaying(true)
+        videoRef.current.pause()
+        setIsPauseLoading(false)
+        if (loggedInUser._id === user._id) {
+            addToast("success", `video paused`)
+        } else {
+            addToast("success", `${user.username} paused the video`)
+        }
+    }
+
+    const requestFullScreen = (element) => {
+        if (element.requestFullscreen) {
+            element.requestFullscreen()
+        } else if (element.mozRequestFullScreen) { // For Firefox
+            element.mozRequestFullScreen()
+        } else if (element.webkitRequestFullscreen) { // For Chrome, Safari, and Opera
+            element.webkitRequestFullscreen()
+        } else if (element.msRequestFullscreen) { // For IE/Edge
+            element.msRequestFullscreen()
+        }
+    }
+    
+    // To exit full screen
+    const exitFullScreen = () => {
+        if (document.exitFullscreen) {
+            document.exitFullscreen()
+        } else if (document.mozCancelFullScreen) { // For Firefox
+            document.mozCancelFullScreen()
+        } else if (document.webkitExitFullscreen) { // For Chrome, Safari, and Opera
+            document.webkitExitFullscreen()
+        } else if (document.msExitFullscreen) { // For IE/Edge
+            document.msExitFullscreen()
+        }
+    }
+
+    const handleExpand = () => {
+        setVideoExpanded(true)
+        requestFullScreen(document.documentElement)  // Request fullscreen on expand
+
+        //alternative method
+        //instead of making the entire page to be fullscrren, make the video element only
+        // if (videoRef.current) {
+        //     requestFullScreen(videoRef.current)  // Request fullscreen for the video element
+        // }
+    }
+
+    const handleCollapse = () => {
+        setVideoExpanded(false)
+        exitFullScreen()  // Exit fullscreen on collapse
+    }    
 
     // useEffect(() => {
     //     if (videoRef?.current && room?.video.videoUrl) {
@@ -286,33 +364,46 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
     }, [isUseEffectLoading, isRedirectLoading, videoRef, duration, room?.video?.videoUrl])
 
     useEffect(() => {
-        const handlePlayingTheVideo = ({ user, currentTime }) => {
-            videoRef.current.currentTime = currentTime
-            setCurrentTime(currentTime)
-            updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
-            setIsVideoNotPlaying(false)
-            videoRef.current.play()
-            setIsPlayLoading(false)
-            if (loggedInUser._id === user._id) {
-                addToast("success", `video playing`)
+        if (!videoRef) return
+        // if (playPause)
+        if (playPause.user && playPause.currentTime) {
+            if (playPause.isPlaying) {
+                handlePlayingTheVideo(playPause.user, playPause.currentTime)
             } else {
-                addToast("success", `${user.username} played the video`)
+                console.log(playPause, "paused")
+                handlePausingTheVideo(playPause.user, playPause.currentTime)
             }
         }
+    }, [playPause])
 
-        const handlePausingTheVideo = ({ user, currentTime }) => {
-            videoRef.current.currentTime = currentTime
-            setCurrentTime(currentTime)
-            updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
-            setIsVideoNotPlaying(true)
-            videoRef.current.pause()
-            setIsPauseLoading(false)
-            if (loggedInUser._id === user._id) {
-                addToast("success", `video paused`)
-            } else {
-                addToast("success", `${user.username} paused the video`)
-            }
-        }
+    useEffect(() => {
+        // const handlePlayingTheVideo = ({ user, currentTime }) => {
+        //     videoRef.current.currentTime = currentTime
+        //     setCurrentTime(currentTime)
+        //     updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
+        //     setIsVideoNotPlaying(false)
+        //     videoRef.current.play()
+        //     setIsPlayLoading(false)
+        //     if (loggedInUser._id === user._id) {
+        //         addToast("success", `video playing`)
+        //     } else {
+        //         addToast("success", `${user.username} played the video`)
+        //     }
+        // }
+
+        // const handlePausingTheVideo = ({ user, currentTime }) => {
+        //     videoRef.current.currentTime = currentTime
+        //     setCurrentTime(currentTime)
+        //     updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
+        //     setIsVideoNotPlaying(true)
+        //     videoRef.current.pause()
+        //     setIsPauseLoading(false)
+        //     if (loggedInUser._id === user._id) {
+        //         addToast("success", `video paused`)
+        //     } else {
+        //         addToast("success", `${user.username} paused the video`)
+        //     }
+        // }
 
         const handleSeekingTheVideo = ({ user, seekTime }) => {
             videoRef.current.currentTime = seekTime
@@ -331,14 +422,14 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
             }
         }
 
-        socket.on("playingTheVideo", handlePlayingTheVideo)
-        socket.on("pausingTheVideo", handlePausingTheVideo)
+        // socket.on("playingTheVideo", handlePlayingTheVideo)
+        // socket.on("pausingTheVideo", handlePausingTheVideo)
         socket.on("seekingTheVideo", handleSeekingTheVideo)
         socket.on("syncingTheVideo", handleSyncingTheVideo)
 
         return () => {
-            socket.off("playingTheVideo", handlePlayingTheVideo)
-            socket.off("pausingTheVideo", handlePausingTheVideo)
+            // socket.off("playingTheVideo", handlePlayingTheVideo)
+            // socket.off("pausingTheVideo", handlePausingTheVideo)
             socket.off("seekingTheVideo", handleSeekingTheVideo)
             socket.off("syncingTheVideo", handleSyncingTheVideo)
         }
@@ -349,7 +440,7 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
         onMouseEnter={handleVideoMouseEnter} 
         onMouseMove={handleVideoMouseMove} 
         onMouseLeave={handleVideoMouseLeave} 
-        className={videoExpanded ? `fixed top-0 left-0 h-screen w-full z-40` : `h-[26vh] w-full xs:h-[31vh] sm:w-full sm:h-[80vh] sm:rounded-xl lg:w-2/3 lg:h-full lg:rounded-xl relative bg-neutral-900`}>
+        className={videoExpanded ? `fixed top-0 left-0 h-screen w-screen z-50` : `h-[26vh] w-full xs:h-[31vh] sm:w-full sm:h-[80vh] sm:rounded-xl lg:w-2/3 lg:h-full lg:rounded-xl relative bg-neutral-900`}>
             <div className={`${ room?.video?.videoUrl ? 'hidden' : 'flex' } gap-4 flex-col items-center justify-center h-full w-full sm:rounded-xl`}>
                 <div className='h-[60px] w-[60px] sm:h-[80px] sm:w-[80px] bg-neutral-900 border border-white rounded-full flex items-center justify-center'>
                     <FaVideoSlash className='h-[20px] w-[20px] sm:h-[25px] sm:w-[25px]' />
@@ -435,11 +526,11 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
                             <FaDownload className='h-[16px] w-[16px] xs:h-[25px] xs:w-[25px]' />
                         </div>
                         {videoExpanded ? (
-                            <div onClick={() => setVideoExpanded(false)} className='flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 ease-in-out'>
+                            <div onClick={handleCollapse} className='flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 ease-in-out'>
                                 <FaCompress className='h-[16px] w-[16px] xs:h-[25px] xs:w-[25px]' />
                             </div>
                         ) : (
-                            <div onClick={() => setVideoExpanded(true)} className='flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 ease-in-out'>
+                            <div onClick={handleExpand} className='flex items-center justify-center cursor-pointer hover:scale-110 transition-all duration-300 ease-in-out'>
                                 <FaExpand className='h-[16px] w-[16px] xs:h-[25px] xs:w-[25px]' />
                             </div>
                         )}

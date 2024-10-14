@@ -29,6 +29,11 @@ const loginUser = async (req, res) => {
 const signupUser = async (req, res) => {
     try {
         const { username, password } = req.body
+
+        if (username.length > 28) {
+            return res.status(409).json({ error: "Username is too long" })    
+        }
+
         createdUser = await User.findOne({ username })
 
         if (createdUser) {

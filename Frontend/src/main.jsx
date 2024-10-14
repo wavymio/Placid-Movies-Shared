@@ -8,6 +8,7 @@ import { ToastProvider } from './contexts/ToastContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { SocketProvider } from './contexts/SocketContext'
 import { LoadingProvider } from './contexts/LoadingContext'
+import { PlayPauseProvider } from './contexts/PlayPauseContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,9 +26,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <AuthProvider>
           <SocketProvider>
             <LoadingProvider>
-              <Router>
-                <AppRoutes />
-              </Router>
+              <PlayPauseProvider>
+                <Router>
+                  <AppRoutes />
+                </Router>
+              </PlayPauseProvider>
             </LoadingProvider>
           </SocketProvider>
         </AuthProvider>
