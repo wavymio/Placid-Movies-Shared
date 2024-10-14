@@ -2,6 +2,51 @@ const mongoose= require('mongoose')
 const { io, userSocketMap } = require('../socket/socket')
 const Room = require('../models/rooms')
 
+const getTrendingRooms = async (req, res) => {
+    try {
+        const rooms = await Room.aggregate([
+            // Add a new field "participantsCount" which contains the length of the participants array
+            { 
+                $addFields: { participantsCount: { $size: "$participants" } }
+            },
+            // Sort by "participantsCount" in descending order
+            { 
+                $sort: { participantsCount: -1 }
+            },
+            // Limit the results to 20 rooms
+            { 
+                $limit: 20
+            }
+        ])
+
+        if (!rooms) {
+            return res.status(400).json({ error: "No rooms found" })
+        }
+        
+        return res.status(200).json(rooms)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+}
+
+const getRecentRooms = async (req, res) => {
+    try {
+        const rooms = await Room.find()
+            .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (newest to oldest)
+            .limit(20) // Limit to 20 rooms
+
+        if (!rooms) {
+            return res.status(400).json({ error: "No rooms found" })
+        }
+        
+        return res.status(200).json(rooms)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+}
+
 const getRoom = async (req, res) => {
     try {
         const { roomId } = req.params
@@ -66,5 +111,7 @@ const rejectRoomInvite = async (req, res) => {
 
 module.exports = {
     joinRoom,
-    getRoom
+    getRoom,
+    getTrendingRooms,
+    getRecentRooms
 }
