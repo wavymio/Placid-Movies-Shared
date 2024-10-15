@@ -366,7 +366,7 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
     useEffect(() => {
         if (!videoRef) return
         // if (playPause)
-        if (playPause.user && playPause.currentTime) {
+        if (playPause.user && (playPause.currentTime !== undefined && playPause.currentTime !== null)) {
             if (playPause.isPlaying) {
                 handlePlayingTheVideo(playPause.user, playPause.currentTime)
             } else {
