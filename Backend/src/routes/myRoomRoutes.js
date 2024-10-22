@@ -12,7 +12,9 @@ router.patch('/:roomId/change-video', verifyToken, myRoomController.changeVideo)
 router.post('/:roomId/invite-user', verifyToken, myRoomController.inviteUser)
 router.patch('/:roomId/promote-to-admin', verifyToken, myRoomController.promoteToAdmin)
 router.patch('/:roomId/demote-my-admin', verifyToken, myRoomController.demoteMyAdmin)
-
+router.patch('/:roomId/reject-invite', verifyToken, myRoomController.rejectInvite)
+router.patch('/:roomId/save', verifyToken, myRoomController.saveRoom)
+router.patch('/:roomId/like', verifyToken, myRoomController.likeRoom)
 
 // you moron.. you should've passed a middleware to run the admin validation process
 module.exports = router

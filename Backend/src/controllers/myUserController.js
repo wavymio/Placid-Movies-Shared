@@ -124,7 +124,18 @@ const getUser = async (req, res) => {
                 },
                 options: { sort: { date: -1 } }
             })
-            .populate("rooms")
+            .populate({
+                path: "rooms",
+                select: 'name coverPhoto theme'
+            })
+            .populate({ 
+                path: "savedRooms",
+                select: 'name coverPhoto theme'
+            })
+            .populate({
+                path: "favoriteRooms",
+                select: 'name coverPhoto theme'
+            })
 
         if (!user) {
             return res.status(404).json({ error: "User not found" })
@@ -154,6 +165,32 @@ const getUser = async (req, res) => {
     }
 } 
 
+const getUserActivity = async (req, res) => {
+    try {
+        const { userId } = req
+        const user = await User.findById(userId)
+            .select("recentRooms")
+            .populate({
+                path: "recentRooms.roomId",
+                select: "name coverPhoto theme participants"
+            })
+
+        if (!user) {
+            return res.status(200).json([])
+        }
+        const activity = []
+        const sortedRooms = user.recentRooms.sort((a, b) => b.joinedAt - a.joinedAt)
+        sortedRooms.map(room => {
+            return activity.push(room.roomId)
+        })
+
+        return res.status(200).json(activity)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+}
+
 const logoutUser = async (req, res) => {
     try {
         res.clearCookie("jwt")
@@ -170,5 +207,6 @@ module.exports = {
     loginUser,
     signupUser,
     getUser,
+    getUserActivity,
     logoutUser,
 }

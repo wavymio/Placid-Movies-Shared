@@ -1,12 +1,15 @@
+import { useQueryClient } from 'react-query'
+import { useRejectInvite } from '../api/MyRoomApi'
 import { useLoading } from '../contexts/LoadingContext'
 import { useSocket } from '../contexts/SocketContext'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const RoomRequestAndInviteNotification = ({ notifType, notification, formatDate, loggedInUser }) => {
+    const queryClient = useQueryClient()
     const { socket } = useSocket()
     const { isRedirectLoading, setIsRedirectLoading } = useLoading()
-    const [isRejectLoading, setIsRejectLoading] = useState(false)
+    const { rejectInvite, isRejectInviteLoading } = useRejectInvite()
     const [selectedNotificationId, setSelectedNotificationId] = useState(null)
     
     const formattedDate = formatDate(notification.date)
@@ -18,12 +21,22 @@ const RoomRequestAndInviteNotification = ({ notifType, notification, formatDate,
         ev.preventDefault()
 
         if (requestType === "join") {
+            if (isRedirectLoading) return
             sessionStorage.removeItem(`userIsRejoining-${notification.link.split('room/')[1]}`)
             socket.emit("joinRoom", {
                 roomId: notification.link.split('room/')[1]
             })
             setSelectedNotificationId(notificationId)
             setIsRedirectLoading(true)
+        }
+
+        if (requestType === "reject") {
+            if (isRejectInviteLoading) return
+            setSelectedNotificationId(notificationId)
+            const data = await rejectInvite(notification.link.split('room/')[1])
+            if (data.success) {
+                await queryClient.invalidateQueries('validateUser')
+            }
         }
     }
  
@@ -39,8 +52,8 @@ const RoomRequestAndInviteNotification = ({ notifType, notification, formatDate,
                             <span>Join</span>
                         )}
                     </button>
-                    <button disabled={isRejectLoading} onClick={(ev) => handleRoomRequests(ev, "reject", notification._id)} className={`min-w-20 xs:min-w-20 bg-red-950 hover:bg-red-900 p-3 xs:p-3 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 font-bold`}>
-                        {(isRejectLoading && (selectedNotificationId === notification?._id)) ? (
+                    <button disabled={isRejectInviteLoading} onClick={(ev) => handleRoomRequests(ev, "reject", notification._id)} className={`min-w-20 xs:min-w-20 bg-red-950 hover:bg-red-900 p-3 xs:p-3 rounded-lg transition-all duration-300 ease-in-out hover:scale-105 font-bold`}>
+                        {(isRejectInviteLoading && (selectedNotificationId === notification?._id)) ? (
                             <span className='loader'></span>
                         ) : (
                             <span>Reject</span>

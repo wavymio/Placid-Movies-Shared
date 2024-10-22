@@ -1,9 +1,11 @@
+import { useRoomEvents } from '../contexts/RoomEventsContext'
 import { usePlayPause } from '../contexts/PlayPauseContext'
 import { useToast } from '../contexts/ToastContext'
 import React, { useEffect, useRef, useState } from 'react'
 import { FaCompress, FaDownload, FaEdit, FaExpand, FaPause, FaPlay, FaUsers, FaVideo, FaVideoSlash, FaVolumeDown, FaVolumeMute, FaVolumeUp } from "react-icons/fa"
 
 const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, loggedInUser, socket }) => {
+    const { roomEvent, changeRoomEvent } = useRoomEvents()
     const { playPause } = usePlayPause()
     const [isVideoNotPlaying, setIsVideoNotPlaying] = useState(true)
     const [toggleVolume, setToggleVolume] = useState(true)
@@ -252,9 +254,9 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
         videoRef.current.play()
         setIsPlayLoading(false)
         if (loggedInUser._id === user._id) {
-            addToast("success", `video playing`)
+            changeRoomEvent(`Video Playing`)
         } else {
-            addToast("success", `${user.username} played the video`)
+            changeRoomEvent(`${user.username} played the video`)
         }
     }
 
@@ -266,9 +268,9 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
         videoRef.current.pause()
         setIsPauseLoading(false)
         if (loggedInUser._id === user._id) {
-            addToast("success", `video paused`)
+            changeRoomEvent(`Video paused`)
         } else {
-            addToast("success", `${user.username} paused the video`)
+            changeRoomEvent(`${user.username} paused the video`)
         }
     }
 
@@ -377,34 +379,6 @@ const VideoPlayer = ({ formatTime, room, isUseEffectLoading, isRedirectLoading, 
     }, [playPause])
 
     useEffect(() => {
-        // const handlePlayingTheVideo = ({ user, currentTime }) => {
-        //     videoRef.current.currentTime = currentTime
-        //     setCurrentTime(currentTime)
-        //     updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
-        //     setIsVideoNotPlaying(false)
-        //     videoRef.current.play()
-        //     setIsPlayLoading(false)
-        //     if (loggedInUser._id === user._id) {
-        //         addToast("success", `video playing`)
-        //     } else {
-        //         addToast("success", `${user.username} played the video`)
-        //     }
-        // }
-
-        // const handlePausingTheVideo = ({ user, currentTime }) => {
-        //     videoRef.current.currentTime = currentTime
-        //     setCurrentTime(currentTime)
-        //     updateSeekbarGradient(((currentTime/duration) * 100), ((currentTime/duration) * 100))
-        //     setIsVideoNotPlaying(true)
-        //     videoRef.current.pause()
-        //     setIsPauseLoading(false)
-        //     if (loggedInUser._id === user._id) {
-        //         addToast("success", `video paused`)
-        //     } else {
-        //         addToast("success", `${user.username} paused the video`)
-        //     }
-        // }
-
         const handleSeekingTheVideo = ({ user, seekTime }) => {
             videoRef.current.currentTime = seekTime
             setCurrentTime(seekTime)

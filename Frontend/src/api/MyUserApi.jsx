@@ -42,6 +42,36 @@ export const useGetMyUser = () => {
     return { userInfo, isLoading, isError }
 }
 
+export const useGetMyUserActivity = (userId) => {
+    const { addToast } = useToast()
+
+    const useGetMyUserActivityRequest = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/my/user/activity`, {
+                credentials: 'include'
+            })
+    
+            if (!response.ok) {
+                const error = await response.json()
+                console.log(error)
+                throw new Error(error.error)
+            }
+
+            const data = await response.json()
+            return data
+        } catch (err) {
+            console.log(err)
+            // addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { data: userActivity, isLoading: isGetMyActivityLoading } = useQuery(['getUserActivity', userId], useGetMyUserActivityRequest, {
+        enabled: !!userId
+    })
+
+    return { userActivity, isGetMyActivityLoading }
+}
+
 export const useLogoutMyUser = () => {
     const { addToast } = useToast()
 

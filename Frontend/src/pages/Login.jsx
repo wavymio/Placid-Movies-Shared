@@ -16,12 +16,8 @@ const Login = () => {
         const res = await loginUser(inputs)
         setResponse(res)
         if (res?.success) {
-            const redirectToRoom = sessionStorage.getItem('redirectToRoom')
+            // const redirectToRoom = sessionStorage.getItem('redirectToRoom')
             await queryClient.invalidateQueries('validateUser')
-            if (redirectToRoom) {
-                sessionStorage.removeItem('redirectToRoom')
-                navigate(redirectToRoom)
-            }
         }
     }
 

@@ -7,6 +7,7 @@ const upload = require('../middleware/multerParse')
 
 
 router.get('/', verifyToken, myUserController.getUser)
+router.get('/activity', verifyToken, myUserController.getUserActivity)
 router.post('/login', validateMyUserRequest, myUserController.loginUser)
 router.post('/signup', validateMyUserRequest, myUserController.signupUser)
 router.patch('/edit/username', verifyToken, validateMyPatchEditRequest, myUserController.patchEditUsername)

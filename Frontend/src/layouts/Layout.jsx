@@ -7,6 +7,7 @@ import { useSocket } from '../contexts/SocketContext'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLoading } from '../contexts/LoadingContext'
 import { usePlayPause } from '../contexts/PlayPauseContext'
+import { useRoomEvents } from '../contexts/RoomEventsContext'
 
 const Layout = ({ children }) => {
     const { roomId: gottenRoomId } = useParams()
@@ -15,6 +16,7 @@ const Layout = ({ children }) => {
     const { isLoading: isAuthLoading, loggedInUser } = useAuth()
     const { addToast } = useToast()
     const { socket } = useSocket()
+    const { roomEvent, changeRoomEvent } = useRoomEvents()
     const { isRedirectLoading, setIsRedirectLoading } = useLoading()
     const { playPause, setPlayPause } = usePlayPause()
     const topGRef = useRef(null)
@@ -84,34 +86,36 @@ const Layout = ({ children }) => {
             }
 
             const handleUserJoined = async (data) => {
+                console.log("1")
                 // await queryClient.invalidateQueries('validateUser')
                 await queryClient.invalidateQueries(['getRoom', roomId])
-                // await queryClient.invalidateQueries('getRoom')
+                changeRoomEvent(loggedInUser._id === data.user._id ? `Welcome, ${data.user.username}` : `${data.user.username} joined the room`)
                 // if (loggedInUser._id === data.user._id) {
                 //     addToast("success", `Welcome btc, ${data.user.username}`)
                 // } else {
                 //     addToast("success", `${data.user.username} joined the room`)
                 // }
-                if (!sessionStorage.getItem(`userIsRejoining-${roomId}`)) {
+                console.log("2")
+                if (!sessionStorage.getItem(`userIsRejoining-${data.room._id}`)) {
                     navigate(`/room/${data.room._id}`)
+                    console.log("3")
                 }
                 setIsRedirectLoading(false)
+                console.log("4")
             }
 
             const handleUserLeft = async (data) => {
                 await queryClient.invalidateQueries(['getRoom', roomId])
-                // await queryClient.invalidateQueries('getRoom')
-                addToast("success", `${data.user.username} left the room`)
+                changeRoomEvent(`${data.user.username} left the room`)
             }
 
             const handleRoomUpdated = async (data) => {
                 console.log(roomId)
                 await queryClient.invalidateQueries(['getRoom', roomId])
-                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.user._id) {
-                    addToast("success", "Room Updated")
+                    changeRoomEvent("Room Updated")
                 } else {
-                    addToast("success", `Room updated by ${data.user.username}`)
+                    changeRoomEvent(`Room updated by ${data.user.username}`)
                 }
             } 
 
@@ -122,36 +126,36 @@ const Layout = ({ children }) => {
 
             const handleVideoChanged = async (data) => {
                 await queryClient.invalidateQueries(['getRoom', roomId])
-                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.user._id) {
-                    addToast("success", "Video Changed!")
+                    changeRoomEvent("Video Changed!")
                 } else {
-                    addToast("success", `Video changed by ${data.user.username}`)
+                    changeRoomEvent(`Video changed by ${data.user.username}`)
                 }
             }
 
             const handleUserInvited = async (data) => {
                 await queryClient.invalidateQueries(['getRoom', roomId])
-                // await queryClient.invalidateQueries('getRoom')
+            }
+
+            const handleInviteRejected = async () => {
+                await queryClient.invalidateQueries(['getRoom', roomId])
             }
 
             const handleAdminPromoted = async (data) => {
                 await queryClient.invalidateQueries(['getRoom', roomId])
-                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.participant._id) {
-                    addToast("success", `You have been promoted by ${data.user.username}`)
+                    changeRoomEvent(`You have been promoted by ${data.user.username}`)
                 } else {
-                    addToast("success", `${data.participant.username} has been promoted to noble by ${data.user.username}`)
+                    changeRoomEvent(`${data.participant.username} has been promoted to noble by ${data.user.username}`)
                 }
             }
 
             const handleAdminDemoted = async (data) => {
                 await queryClient.invalidateQueries(['getRoom', roomId])
-                // await queryClient.invalidateQueries('getRoom')
                 if (loggedInUser._id === data.participant._id) {
-                    addToast("success", `${data.user.username} has made you a peasant`)
+                    changeRoomEvent(`${data.user.username} has made you a peasant`)
                 } else {
-                    addToast("success", `${data.user.username} has made ${data.participant.username} a peasant`)
+                    changeRoomEvent(`${data.user.username} has made ${data.participant.username} a peasant`)
                 }
             }
 
@@ -180,6 +184,7 @@ const Layout = ({ children }) => {
             socket.on("getLost", handleGetLost)
             socket.on("videoChanged", handleVideoChanged)
             socket.on("userInvited", handleUserInvited)
+            socket.on("inviteRejected", handleInviteRejected)
             socket.on("promotedAdmin", handleAdminPromoted)
             socket.on("demotedAdmin", handleAdminDemoted)
 
@@ -204,6 +209,7 @@ const Layout = ({ children }) => {
                 socket.off("getLost", handleGetLost)
                 socket.off("videoChanged", handleVideoChanged)
                 socket.off("userInvited", handleUserInvited)
+                socket.off("inviteRejected", handleInviteRejected)
                 socket.off("promotedAdmin", handleAdminPromoted)
                 socket.off("demotedAdmin", handleAdminDemoted)            
                 

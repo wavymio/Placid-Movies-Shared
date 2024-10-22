@@ -1,20 +1,28 @@
 import { useGetRecentRooms, useGetTrendingRooms } from '../api/RoomApi'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import HomeRooms from '../components/HomeRooms'
 import { useAuth } from '../contexts/AuthContext'
 import { IoCloseSharp } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from 'react-query'
+import { useSocket } from '../contexts/SocketContext'
+import { useLoading } from '../contexts/LoadingContext'
+import { useGetMyUserActivity } from '../api/MyUserApi'
 
 const Home = () => {
+    const queryClient = useQueryClient()
     const { isLoggedIn, isLoading, loggedInUser } = useAuth()
+    const { socket, isSocketLoading } = useSocket()
+    const { isRedirectLoading, setIsRedirectLoading } = useLoading()
     const { trendingRooms, isGetTrendingRoomsLoading } = useGetTrendingRooms()
     const { recentRooms, isGetRecentRoomsLoading } = useGetRecentRooms()
+    const { userActivity, isGetMyActivityLoading } = useGetMyUserActivity(loggedInUser?._id)
     const navigate = useNavigate()
     const [openLogin, setOpenLogin] = useState(false)
     const [roomId, setRoomId] = useState(null)
 
     const handleRedirectToLoginOrSignUp = (page) => {
-        const roomLink = `/room/${roomId}`
+        const roomLink = roomId
         sessionStorage.setItem('redirectToRoom', roomLink)
         if (page === "login") {
             navigate('/login')
@@ -24,22 +32,52 @@ const Home = () => {
         }
         
     }
+
+    useEffect(() => {
+        console.log("hit")
+        console.log(socket?.connected)
+        console.log(sessionStorage.getItem('redirectToRoom'))
+        if (socket?.connected && sessionStorage.getItem('redirectToRoom')) {
+            const roomId = sessionStorage.getItem('redirectToRoom')
+            sessionStorage.removeItem('redirectToRoom')
+            setIsRedirectLoading(true)
+            sessionStorage.removeItem(`userIsRejoining-${roomId}`)
+            socket.emit("joinRoom", {
+                roomId
+            })
+            console.log("done")
+        }
+    }, [socket?.connected])
     
-    if (isGetTrendingRoomsLoading || isGetRecentRoomsLoading || isLoading) {
+    if (isGetTrendingRoomsLoading || isGetRecentRoomsLoading || isGetMyActivityLoading || isLoading) {
         return (
             <div className='overflow-y-hidden w-full h-[43vh] pb-2 flex justify-center items-center pt-[145px] lg:pt-[200px]'>
                 <div className='big-loader'></div>
             </div>
         )
     }
+
+    if (isRedirectLoading) {
+        return (
+            <div className='overflow-y-hidden w-full h-screen flex flex-col gap-7 items-center pt-[145px] lg:pt-[200px]'>
+                <div className='big-loader'></div>
+                <div className='text-xs font-bold'>REDIRECTING TO ROOM...</div>
+            </div>
+        )
+    }
+
     return (
         <div className={`flex flex-col gap-7 xs:gap-10 sm:gap-20`}>
             {trendingRooms.length > 0 && (
-                <HomeRooms rooms={trendingRooms} isLoggedIn={isLoggedIn} setOpenLogin={setOpenLogin} setRoomId={setRoomId} category={"trending"} />
+                <HomeRooms socket={socket} rooms={trendingRooms} isLoggedIn={isLoggedIn} setOpenLogin={setOpenLogin} setRoomId={setRoomId} category={"trending"} />
             )}
 
             {recentRooms.length > 0 && (
-                <HomeRooms rooms={recentRooms} isLoggedIn={isLoggedIn} setOpenLogin={setOpenLogin} setRoomId={setRoomId} category={"recent"} />
+                <HomeRooms socket={socket} rooms={recentRooms} isLoggedIn={isLoggedIn} setOpenLogin={setOpenLogin} setRoomId={setRoomId} category={"recent"} />
+            )}
+
+            {((userActivity?.length > 0) && isLoggedIn) && (
+                <HomeRooms socket={socket} rooms={userActivity} isLoggedIn={isLoggedIn} setOpenLogin={setOpenLogin} setRoomId={setRoomId} category={"activity"} />
             )}
 
             {openLogin && (

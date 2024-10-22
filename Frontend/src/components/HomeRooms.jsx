@@ -1,24 +1,31 @@
+import { useLoading } from '../contexts/LoadingContext'
 import React from 'react'
 import { IoPerson } from 'react-icons/io5'
 import { useNavigate } from 'react-router-dom'
 
-const HomeRooms = ({ rooms, isLoggedIn, setOpenLogin, setRoomId, category }) => {
+const HomeRooms = ({ socket, rooms, isLoggedIn, setOpenLogin, setRoomId, category }) => {
     const navigate = useNavigate()
+    const { isRedirectLoading, setIsRedirectLoading } = useLoading()
 
     const goToRoom = (roomId) => {
-        const roomLink = `/room/${roomId}`
+        // const roomLink = `/room/${roomId}`
         if (!isLoggedIn) {
             setRoomId(roomId)
             setOpenLogin(true)
             return
         } else {
-            navigate(roomLink)
+            setIsRedirectLoading(true)
+            sessionStorage.removeItem(`userIsRejoining-${roomId}`)
+            socket?.emit("joinRoom", {
+                roomId
+            })
+            // navigate(roomLink)
         }
     }
 
     return (
         <div className='flex flex-col'>
-            <div className='text-xl xs:text-2xl sm:text-3xl font-bold'>{category === "trending" ? 'Trending Rooms' : category === "recent" ? 'Newest Spots' : null}</div>
+            <div className='text-xl xs:text-2xl sm:text-3xl font-bold'>{category === "trending" ? 'Trending Rooms' : category === "recent" ? 'Newest Spots' : category === "activity" ? 'Travel History' : null}</div>
             <div className='flex gap-7 sm:gap-10 overflow-x-scroll pt-8 pb-8'>
             {rooms.map((room, index) => (
                 <div key={index} onClick={() => goToRoom(room._id)} className='w-20 xs:w-32 sm:w-44 cursor-pointer flex flex-col gap-2'>

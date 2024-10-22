@@ -7,12 +7,12 @@ const getUser = async (req, res) => {
     try {
         const { id } = req.params
         const user = await User.findById(id)
-        .select("-password")
+        .select("-password -notifications -downloads -savedVideos")
         .populate({
             path: 'friends.userId',
             select: 'username profilePicture',
         })
-        .populate("rooms")
+        .populate("currentRoom")
 
         if (!user) {
             return res.status(400).json({ error: "User not found" })

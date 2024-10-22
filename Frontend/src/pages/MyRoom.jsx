@@ -36,7 +36,7 @@ const MyRoom = ({ scrollToTop }) => {
     const handleRejoinRoom = () => {
         console.log("user rejoining")
         console.log(socket, " 2")
-        sessionStorage.setItem(`userIsRejoining-${roomId}`, 'false')
+        sessionStorage.removeItem(`userIsRejoining-${roomId}`)
         socket.emit('joinRoom', { roomId })
         setIsRedirectLoading(true)
     }
@@ -54,26 +54,28 @@ const MyRoom = ({ scrollToTop }) => {
 
         console.log(socket, " 1")
         setTimeout(() => {            
-            if (userIsRejoining) {
+            if (sessionStorage.getItem(`userIsRejoining-${roomId}`)) {
+                console.log("user rejoining?: ", userIsRejoining)
                 if (socket && socket.connected && !isSocketLoading) {
                     handleRejoinRoom()
                     setIsUseEffectLoading(false)
+                    sessionStorage.setItem(`userIsRejoining-${roomId}`, 'true')
                 } else {
                     const intervalId = setInterval(() => {
                         if (socket && socket.connected && !isSocketLoading) {
                             handleRejoinRoom()
                             clearInterval(intervalId)
                             setIsUseEffectLoading(false)
+                            sessionStorage.setItem(`userIsRejoining-${roomId}`, 'true')
                         }
                     }, 1000)
                 }
             } else {
                 setIsUseEffectLoading(false)
+                sessionStorage.setItem(`userIsRejoining-${roomId}`, 'true')
             }
         }, 1000)
-
-        sessionStorage.setItem(`userIsRejoining-${roomId}`, 'true')
-
+        // sessionStorage.setItem(`userIsRejoining-${roomId}`, 'true')
         return () => {    
             if (socket && sessionStorage.getItem(`userIsRejoining-${roomId}`)) {
                 console.log("removing...")

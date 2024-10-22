@@ -7,12 +7,14 @@ import { LiaCommentSlashSolid } from "react-icons/lia"
 import { FaCheck, FaCheckDouble } from 'react-icons/fa'
 import { debounce } from 'lodash'
 import { useQueryClient } from 'react-query'
+import { useRoomEvents } from '../contexts/RoomEventsContext'
 
 const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
     const queryClient = useQueryClient()
     const { conversation, isConversationLoading } = useGetConversation(room.conversation._id)
     const { seenStatuses, isSeenStatusesLoading } = useGetSeenStatuses(room.conversation._id)
     const { sendMessage, isSendMessageLoading } = useSendMessage()
+    const { roomEvent, changeRoomEvent } = useRoomEvents()
     const [messageMode, setMessageMode] = useState('text')
     const [textMessage, setTextMessage] = useState('')
     const [imageCaption, setImageCaption] = useState('')
@@ -30,6 +32,7 @@ const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
     const [sendingQueue, setSendingQueue] = useState([])
     const [markingQueue, setMarkingQueue] = useState([])
     const [isMarking, setIsMarking] = useState(false)
+    const [animationKey, setAnimationKey] = useState(0)
 
     const formatMessageDate = (dateString) => {
         const date = parseISO(dateString)
@@ -349,6 +352,12 @@ const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
         }
     }, [messages])
 
+    useEffect(() => {
+        if (roomEvent) {
+            setAnimationKey(prevKey => prevKey + 1)
+        }
+    }, [roomEvent])
+
     if (!conversation || isConversationLoading || isSeenStatusesLoading) {
         return (
             <div className={`xs:h-[48vh] xs:w-full sm:w-full sm:h-[80vh] flex justify-center relative lg:bg-neutral-950 lg:w-1/3 lg:h-full rounded-xl`}>
@@ -364,8 +373,13 @@ const ChatBox = ({ room, loggedInUser, socket, scrollToTop }) => {
         <div ref={containerRef} className={`px-1 sm:px-0 h-[54vh] mt-1 xs:bg-black xs:h-[48vh] xs:w-full sm:pt-[10px] sm:pb-[95px] sm:bg-black sm:w-full sm:h-[80vh] sm:rounded-xl lg:bg-neutral-950 lg:w-1/3 lg:h-full lg:rounded-xl lg:pt-[50px] ${conversation.messages?.length < 1 ? 'flex justify-center' : 'flex flex-col'} relative `}>
             <div className='hidden lg:flex items-center pl-5 absolute top-0 left-0 gap-2 rounded-t-xl bg-neutral-900 w-full h-14'>
                 <div className='h-3 w-3 rounded-full bg-green-300'></div>
-                <div className='text-[13px] font-semibold'>{room.participants.length} participants online</div>
+                <div key={animationKey} className='room-event-animation-large text-[13px] font-semibold'>{roomEvent ? roomEvent : `${room.participants.length} participants online`}</div>
             </div>
+            {roomEvent && (
+                <div key={animationKey} className='room-event-animation absolute top-0 right-2 text-xs rounded-l-xl w-auto px-3 py-2 font-bold flex lg:hidden bg-slate-800 items-center justify-center'>
+                    {roomEvent}
+                </div>
+            )}
             <>
                 {conversation.messages?.length < 1 ? (
                     <div className='mt-14 sm:mt-36 flex flex-col items-center gap-4'>

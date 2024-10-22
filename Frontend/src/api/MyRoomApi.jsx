@@ -216,6 +216,42 @@ export const useInviteUser = () => {
     }
 }
 
+export const useRejectInvite = () => {
+    const { addToast } = useToast()
+
+    const rejectInviteRequest = async (roomId) => {
+        try {
+            if (!roomId) {
+                throw new Error("Cannot get Room")
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/my/room/${roomId}/reject-invite`, {
+                method: "PATCH",
+                credentials: 'include',
+                headers: {'Content-Type': "application/json"}
+            })
+    
+            if (!response.ok) {
+                const error = await response.json()
+                console.log(error)
+                throw new Error(error.error)
+            }
+            
+            const data = await response.json()
+            return data
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: rejectInvite, isLoading: isRejectInviteLoading } = useMutation(rejectInviteRequest)
+
+    return {
+        rejectInvite,
+        isRejectInviteLoading
+    }
+}
+
 export const usePromoteToAdmin = () => {
     const { addToast } = useToast()
 
@@ -287,5 +323,75 @@ export const useDemoteMyAdmin = () => {
     return {
         demoteMyAdmin,
         isDemoteMyAdminLoading
+    }
+}
+
+export const useSaveRoom = () => {
+    const { addToast } = useToast()
+
+    const saveRoomRequest = async (roomId) => {
+        try {
+            if (!roomId) {
+                throw new Error("Cannot get Room")
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/my/room/${roomId}/save`, {
+                method: 'PATCH',
+                credentials: 'include'
+            })
+
+            if (!response.ok) {
+                const error = await response.json()
+                console.log(error)
+                return error
+            }
+
+            const data = await response.json()
+            return data
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: saveRoom, isLoading: isSaveRoomLoading } = useMutation(saveRoomRequest)
+
+    return {
+        saveRoom,
+        isSaveRoomLoading
+    }
+}
+
+export const useLikeRoom = () => {
+    const { addToast } = useToast()
+
+    const likeRoomRequest = async (roomId) => {
+        try {
+            if (!roomId) {
+                throw new Error("Cannot get Room")
+            }
+
+            const response = await fetch(`${API_BASE_URL}/api/my/room/${roomId}/like`, {
+                method: 'PATCH',
+                credentials: 'include'
+            })
+
+            if (!response.ok) {
+                const error = await response.json()
+                console.log(error)
+                return error
+            }
+
+            const data = await response.json()
+            return data
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: likeRoom, isLoading: isLikeRoomLoading } = useMutation(likeRoomRequest)
+
+    return {
+        likeRoom,
+        isLikeRoomLoading
     }
 }

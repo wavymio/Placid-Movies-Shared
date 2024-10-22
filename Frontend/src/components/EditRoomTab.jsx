@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { useEditMyRoomNamePhotoTheme, usePatchEditMyRoomCoverPic } from '../api/MyRoomApi'
+import { useEditMyRoomNamePhotoTheme, useLikeRoom, usePatchEditMyRoomCoverPic, useSaveRoom } from '../api/MyRoomApi'
 import roomThemes from '../config/roomThemes'
+import { IoBookmarksSharp } from 'react-icons/io5'
+import { FaBookmark, FaHeart } from 'react-icons/fa'
+import { useQueryClient } from 'react-query'
 
 const EditRoomTab = ({ room, loggedInUser }) => {
+    const queryClient = useQueryClient()
     const { editNameAndCo, isEditNameAndCoLoading } = useEditMyRoomNamePhotoTheme()
     const { patchEditRoomCoverPic, isLoading: isCoverPicLoading } = usePatchEditMyRoomCoverPic()
+    const { saveRoom, isSaveRoomLoading } = useSaveRoom()
+    const { likeRoom, isLikeRoomLoading } = useLikeRoom()
 
     const [ theme, setTheme ] = useState(room.theme)
     const [ roomName, setRoomName ] = useState(room.name)
     const [ roomCover, setRoomCover ] = useState(null)
     const [roomNameError, setRoomNameError] = useState('')
     const [ roomCoverPreview, setRoomCoverPreview ] = useState(room.coverPhoto)
+    const [ isSaved, setIsSaved ] = useState(loggedInUser?.savedRooms?.some(theRoom => theRoom?._id === room?._id))
+    const [ isLiked, setIsLiked ] = useState(loggedInUser?.favoriteRooms?.some(theRoom => theRoom?._id === room?._id))
+    const [error, setError] = useState(false)
 
     const getRoomTheme = (theme) => {
         switch(theme?.name ? theme?.name : theme) {
@@ -70,6 +79,29 @@ const EditRoomTab = ({ room, loggedInUser }) => {
         const data = await editNameAndCo(payload)
     }
 
+    const handleSaveRoom = async (roomId) => {
+        if (!roomId) return
+        if (isSaveRoomLoading) return
+        setIsSaved(!isSaved)
+
+        const data = await saveRoom(roomId)
+        if (data.success) {
+            await queryClient.invalidateQueries("validateUser")
+        } 
+        
+    }
+
+    const handleLikeRoom = async (roomId) => {
+        if (!roomId) return
+        if (isLikeRoomLoading) return
+        setIsLiked(!isLiked)
+
+        const data = await likeRoom(roomId)
+        if (data.success) {
+            await queryClient.invalidateQueries("validateUser")
+        }
+    }
+
     useEffect(() => {
         setTheme(room.theme)
         setRoomName(room.name)
@@ -77,7 +109,12 @@ const EditRoomTab = ({ room, loggedInUser }) => {
         setRoomCoverPreview(room.coverPhoto)
     }, [room])
     return (
-        <form className='-mt-10 xs:mt-0 w-[250px] xs:w-[350px] sm:w-[470px] md:w-[550px] lg:w-[600px] h-[350px] xs:h-[250px] sm:h-[300px] relative bg-black border border-neutral-900 rounded-2xl px-8 py-8 flex flex-col gap-5 items-center'>
+        <form className='-mt-10 xs:mt-0 w-[250px] xs:w-[350px] sm:w-[470px] md:w-[550px] lg:w-[600px] h-[350px] xs:h-[250px] sm:h-[300px] relative bg-black border border-neutral-900 rounded-t-md rounded-b-2xl px-8 py-8 flex flex-col gap-5 items-center'>
+            <div className='absolute z-20 top-1 px-1 w-full flex items-center justify-between'>
+                <div><FaBookmark onClick={() => handleSaveRoom(room?._id)} className={`z-20 h-5 w-5 ${isSaved ? 'text-white' : 'text-neutral-900'} transition-all duration-300 ease-out hover:scale-110 cursor-pointer`}/></div>
+                <div><FaHeart onClick={() => handleLikeRoom(room?._id)} className={`z-20 h-5 w-5 ${isLiked ? 'text-white' : 'text-neutral-900'} transition-all duration-300 ease-out hover:scale-110 cursor-pointer`}/></div>
+            </div>
+
             <div className='flex flex-col items-center gap-4 xs:gap-0 xs:flex-row xs:items-center xs:justify-center w-full'>
                 <div className='xs:w-2/6 xs:flex xs:flex-row xs:justify-left'>
                     <div className={`relative ${getRoomTheme(theme)} p-1 w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full cursor-pointer`}>
@@ -115,10 +152,12 @@ const EditRoomTab = ({ room, loggedInUser }) => {
                     <div  className='bg-red-300 absolute bottom-0 right-0 h-12 w-12 rounded-full'></div>
                 </div>
             </div>
+            
             <div className='w-full flex flex-col'>
                 <input type="text" value={roomName} onChange={(ev) => setRoomName(ev.target.value)} className='text-xs xs:text-sm sm:text-base w-full p-3 border-b-1 border-neutral-800 bg-inherit focus:outline-none placeholder-neutral-200 placeholder:text-xs sm:placeholder:text-sm' placeholder='Room Name' />
                 {roomNameError && (<span className='text-xs ml-3 mt-1 text-red-500'>{roomNameError}</span>)}
             </div>
+           
             {((room.admins.some(admin => admin._id === loggedInUser._id)) || (room.owner.some(owner => owner._id === loggedInUser._id))) && (
                 <button 
                 disabled={isEditNameAndCoLoading} 

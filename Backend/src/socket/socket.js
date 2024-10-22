@@ -24,7 +24,7 @@ io.use(socketAuth)
 
 const userSocketMap = new Map()
 
-const disconnect = async (socket, currentRoomId) => {
+const disconnect = async (socket, testCurrentRoomId) => {
     console.log(`Client disconnected ${socket.id}`)
     const userId = Array.from(userSocketMap.entries())
         .find(([_, id]) => id === socket.id)?.[0]
@@ -33,14 +33,19 @@ const disconnect = async (socket, currentRoomId) => {
         userSocketMap.delete(userId)
         const user = await User.findById(userId)
 
-        if (currentRoomId && user) {
+        if (testCurrentRoomId && user) {
             await Room.updateOne(
-                { _id: currentRoomId },
+                { _id: testCurrentRoomId },
                 { $pull: { participants: { userId } } }
             )
-            io.to(currentRoomId).emit('userLeft', { user })
-            currentRoomId = null
-            console.log(`User ${userId} disconnected from room ${currentRoomId}`)
+            await User.findByIdAndUpdate(userId, {
+                $set: {
+                    currentRoom: null
+                }
+            })
+            io.to(testCurrentRoomId).emit('userLeft', { user })
+            testCurrentRoomId = null
+            console.log(`User ${userId} disconnected from room ${testCurrentRoomId}`)
         }
     } else {
         console.log("User Id not found during disconnection")
@@ -51,7 +56,7 @@ const disconnect = async (socket, currentRoomId) => {
 io.on("connection", async (socket) => {
     // const userId = socket.handshake.query.userId // not safe
     const userId = socket.userId
-    let currentRoomId = null 
+    let testCurrentRoomId = null 
 
     if (userId) {
         userSocketMap.set(userId, socket.id)
@@ -86,19 +91,32 @@ io.on("connection", async (socket) => {
                 return
             }
 
-            if (currentRoomId) {
+            if (testCurrentRoomId) {
                 await Room.updateOne(
-                    { _id: currentRoomId },
+                    { _id: testCurrentRoomId },
                     { $pull: { participants: { userId: userId } } }
                 ).session(session)
-                socket.leave(currentRoomId)
-                io.to(currentRoomId).emit('userLeft', { user })
+                socket.leave(testCurrentRoomId)
+                io.to(testCurrentRoomId).emit('userLeft', { user })
                 console.log("aha")
             }
 
             socket.join(roomId)
-            currentRoomId = roomId
+            testCurrentRoomId = roomId
 
+            const recentRoomIndex = user.recentRooms.findIndex(
+                (room) => room.roomId.toString() === roomId.toString()
+            )
+    
+            if (recentRoomIndex !== -1) {
+                user.recentRooms[recentRoomIndex].joinedAt = Date.now()
+                // user.markModified('recentRooms')
+            } else {
+                user.recentRooms.push({ roomId, joinTime: Date.now() })
+            }
+
+            user.currentRoom = roomId
+    
             await Room.findByIdAndUpdate(roomId, {
                 $addToSet: {
                     participants: {
@@ -111,6 +129,10 @@ io.on("connection", async (socket) => {
             }).session(session)
 
             await User.findByIdAndUpdate(userId, {
+                $set: {
+                    currentRoom: user.currentRoom,
+                    recentRooms: user.recentRooms,
+                },
                 $pull: {
                     receivedRoomInvites: { room: roomId },
                     notifications: {
@@ -146,12 +168,12 @@ io.on("connection", async (socket) => {
     })
 
     socket.on("leaveRoom", async () => {
-        if (currentRoomId) {
+        if (testCurrentRoomId) {
             const session = await mongoose.startSession()
             session.startTransaction()
             try {
                 const user = await User.findById(userId).session(session)
-                const room = await Room.findById(currentRoomId).session(session)
+                const room = await Room.findById(testCurrentRoomId).session(session)
 
                 if (!room || !user) {
                     await session.abortTransaction()
@@ -160,19 +182,26 @@ io.on("connection", async (socket) => {
                 }
 
                 await Room.updateOne(
-                    { _id: currentRoomId },
+                    { _id: testCurrentRoomId },
                     { $pull: { participants: { userId: userId } } }
+                ).session(session)
+
+                await User.findByIdAndUpdate(userId, {
+                    $set: {
+                        currentRoom: null
+                    }
+                }
                 ).session(session)
 
                 await session.commitTransaction()
                 session.endSession()
 
-                socket.leave(currentRoomId)
+                socket.leave(testCurrentRoomId)
 
-                io.to(currentRoomId).emit('userLeft', { user })
-                currentRoomId = null
+                io.to(testCurrentRoomId).emit('userLeft', { user })
+                testCurrentRoomId = null
                 console.log("Leave room emitted")
-                // console.log(`User ${userId} disconnected from room ${currentRoomId}`)
+                // console.log(`User ${userId} disconnected from room ${testCurrentRoomId}`)
                 return
             } catch (err) {
                 console.log("Error leaving room", err)
@@ -349,7 +378,7 @@ io.on("connection", async (socket) => {
     })
 
     socket.on("disconnect", async () => {
-        await disconnect(socket, currentRoomId)
+        await disconnect(socket, testCurrentRoomId)
         return
     })
 })

@@ -1,6 +1,7 @@
 const mongoose= require('mongoose')
 const { io, userSocketMap } = require('../socket/socket')
 const Room = require('../models/rooms')
+const User = require('../models/users')
 
 const getTrendingRooms = async (req, res) => {
     try {
@@ -35,6 +36,24 @@ const getRecentRooms = async (req, res) => {
         const rooms = await Room.find()
             .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (newest to oldest)
             .limit(20) // Limit to 20 rooms
+
+        if (!rooms) {
+            return res.status(400).json({ error: "No rooms found" })
+        }
+        
+        return res.status(200).json(rooms)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+}
+
+const getTopRooms = async (req, res) => {
+    try {
+        const { userId } = req
+        const rooms = await User.findById(userId)
+            .select("recentRooms")
+            
 
         if (!rooms) {
             return res.status(400).json({ error: "No rooms found" })
@@ -113,5 +132,6 @@ module.exports = {
     joinRoom,
     getRoom,
     getTrendingRooms,
-    getRecentRooms
+    getRecentRooms,
+    getTopRooms
 }

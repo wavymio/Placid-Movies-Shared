@@ -12,8 +12,11 @@ import { useCreateMyRoom } from '../api/MyRoomApi'
 import { useQueryClient } from 'react-query'
 import { useSocket } from '../contexts/SocketContext'
 import { useLoading } from '../contexts/LoadingContext'
+import { CiLocationOff } from "react-icons/ci"
+import { useAuth } from '../contexts/AuthContext'
 
-const UserProfileRoomsDisplay = ({ rooms, tab, sameUser }) => {
+const UserProfileRoomsDisplay = ({ user, rooms, tab, sameUser, location, setLocationId, setOpenLogin }) => {
+    const { isLoggedIn } = useAuth()
     const queryClient = useQueryClient()
     const { socket } = useSocket()
     const { isRedirectLoading, setIsRedirectLoading } = useLoading()
@@ -124,11 +127,26 @@ const UserProfileRoomsDisplay = ({ rooms, tab, sameUser }) => {
     }
 
     const joinRoom = (roomId) => {
-        setIsRedirectLoading(true)
         sessionStorage.removeItem(`userIsRejoining-${roomId}`)
+        setIsRedirectLoading(true)
         socket.emit("joinRoom", {
             roomId
         })
+    }
+
+    const joinLocation = (locationId) => {
+        if (isLoggedIn) {
+            console.log(locationId)
+            sessionStorage.removeItem(`userIsRejoining-${locationId}`)
+            setIsRedirectLoading(true)
+            socket.emit("joinRoom", {
+                roomId: locationId
+            })
+            
+        } else {
+            setLocationId(locationId)
+            setOpenLogin(true)
+        }
     }
 
     return (
@@ -144,25 +162,25 @@ const UserProfileRoomsDisplay = ({ rooms, tab, sameUser }) => {
                 }
 
                 {tab === "owned" && !sameUser && rooms.length < 1 &&
-                    <Link to={``} className='flex flex-col items-center gap-2'>
+                    <div className='flex flex-col items-center gap-2'>
                         <div className='flex items-center justify-center h-14 w-14 sm:h-20 sm:w-20 rounded-full p-1 bg-neutral-900 border-1 hover:bg-neutral-800 transition-colors ease-in-out duration-300 '>
                             <FaUsersSlash style={{ color: 'white', fontSize: '25px' }} />
                         </div>
                         <span className='text-xs text-center text-white'>NO {tab.toUpperCase()} ROOMS</span>
-                    </Link>
+                    </div>
                 }
 
                 {rooms?.length > 0 && rooms.map((room, index) => (
-                    <Link key={index} onClick={() => joinRoom(`${room._id}`)} className='max-w-16 sm:max-w-20 flex flex-col items-center gap-2'>
+                    <div key={index} onClick={() => joinRoom(`${room._id}`)} className='max-w-16 sm:max-w-20 flex flex-col items-center gap-2 cursor-pointer'>
                         <div className={`h-14 w-14 sm:h-20 sm:w-20 rounded-full p-1 ${getRoomTheme(room?.theme)}`}>
                             <img src={room?.coverPhoto ? room?.coverPhoto : `https://via.placeholder.com/150`} alt="img" className='h-full w-full rounded-full object-cover' />
                         </div>
                         <span className='overflow-hidden flex items-center justify-center w-full text-xs text-center font-bold'>{room.name}</span>
-                    </Link>
+                    </div>
                 ))}
 
-                {(tab === "saved" || tab === "favorite") && rooms?.length === 0 && 
-                    <Link to={``} className='flex flex-col items-center justify-center gap-2'>
+                {((tab === "saved" || tab === "favorite") && rooms?.length === 0) && 
+                    <div className='flex flex-col items-center justify-center gap-2'>
                         <div className='flex items-center justify-center h-14 w-14 sm:h-20 sm:w-20 rounded-full p-1 bg-neutral-900 border-1 hover:bg-neutral-800 transition-colors ease-in-out duration-300 '>
                             {tab === "saved" ? (
                                 <GoBookmarkSlash style={{ color: 'white', fontSize: '25px' }} />
@@ -171,8 +189,26 @@ const UserProfileRoomsDisplay = ({ rooms, tab, sameUser }) => {
                             )}
                         </div>
                         <span className='text-xs text-center'>NO {tab.toUpperCase()} ROOMS</span>
-                    </Link>
+                    </div>
                 }
+                
+                {(tab === "location" && !location) && (
+                    <div className='flex flex-col items-center gap-2'>
+                        <div className='flex items-center justify-center h-14 w-14 sm:h-20 sm:w-20 rounded-full p-1 bg-neutral-900 border-1 hover:bg-neutral-800 transition-colors ease-in-out duration-300 '>
+                            <CiLocationOff style={{ color: 'white', fontSize: '25px' }} />
+                        </div>
+                        <span className='text-xs text-center text-white'>UNAVAILABLE</span>
+                    </div>
+                )}
+
+                {(tab === "location" && location && !sameUser) && (
+                    <div onClick={() => joinLocation(`${location._id}`)} className='max-w-28 sm:max-w-[148px] flex flex-col items-center gap-2'>
+                        <div className={`h-28 w-28 sm:h-[148px] sm:w-[148px] rounded-xl p-1 ${getRoomTheme(location?.theme)}`}>
+                            <img src={location?.coverPhoto ? location?.coverPhoto : `https://via.placeholder.com/150`} alt="img" className='h-full w-full rounded-xl object-cover' />
+                        </div>
+                        <span className='overflow-hidden flex items-center justify-center w-full text-xs text-center whitespace-nowrap text-ellipsis font-bold'>{location.name}</span>
+                    </div>
+                )}
             </div>
             {showCreateRoomTab && (
                 <div className='flex items-center justify-center shadow-lg rounded-lg w-full h-full fixed top-0 left-0 z-20 bg-transparent backdrop-filter backdrop-blur-lg'>

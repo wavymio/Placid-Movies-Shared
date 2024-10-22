@@ -12,25 +12,21 @@ const updateRooms = async () => {
             useUnifiedTopology: true,
         })
 
-        const roomsToUpdate = await Room.find({
-            lastUpdated: { $type: "date" } // Checking for incorrect value types
-        });
-
-        if (roomsToUpdate.length > 0) {
-            console.log(`Found ${roomsToUpdate.length} rooms with invalid lastUpdated field.`);
-
-            // Update each room's lastUpdated to the correct value
-            for (const room of roomsToUpdate) {
-                room.lastUpdated = Date.now(); // Set to the current timestamp
-                await room.save();
-                console.log(`Updated room ${room._id} with the correct lastUpdated.`);
+        // Update all user documents by setting default values for currentRoom and recentRooms
+        const result = await User.updateMany(
+            { currentRoom: { $exists: false } }, // Only update users that don't have currentRoom
+            {
+                $set: {
+                    currentRoom: null, // Set default value for currentRoom
+                    recentRooms: [] // Set default value for recentRooms as an empty array
+                }
             }
-        } else {
-            console.log('No rooms found with invalid lastUpdated field.');
-        }
+        );
+
+        console.log(`${result.nModified} user(s) updated successfully`);
 
         // Sync indexes with the updated schema
-        await Room.syncIndexes();
+        await User.syncIndexes();
         console.log('Indexes synchronized successfully.');
     } catch (error) {
         console.error('Error updating rooms:', error);
@@ -40,8 +36,45 @@ const updateRooms = async () => {
     }
 };
 
-// Run the update script
 updateRooms();
+
+// const updateRooms = async () => {
+//     try {
+//         await mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
+//             useNewUrlParser: true,
+//             useUnifiedTopology: true,
+//         })
+
+//         const roomsToUpdate = await Room.find({
+//             lastUpdated: { $type: "date" } // Checking for incorrect value types
+//         });
+
+//         if (roomsToUpdate.length > 0) {
+//             console.log(`Found ${roomsToUpdate.length} rooms with invalid lastUpdated field.`);
+
+//             // Update each room's lastUpdated to the correct value
+//             for (const room of roomsToUpdate) {
+//                 room.lastUpdated = Date.now(); // Set to the current timestamp
+//                 await room.save();
+//                 console.log(`Updated room ${room._id} with the correct lastUpdated.`);
+//             }
+//         } else {
+//             console.log('No rooms found with invalid lastUpdated field.');
+//         }
+
+//         // Sync indexes with the updated schema
+//         await Room.syncIndexes();
+//         console.log('Indexes synchronized successfully.');
+//     } catch (error) {
+//         console.error('Error updating rooms:', error);
+//     } finally {
+//         // Close the connection after the update
+//         mongoose.connection.close();
+//     }
+// };
+
+// // Run the update script
+// updateRooms();
 
 // const updateRooms = async () => {
 //     try {

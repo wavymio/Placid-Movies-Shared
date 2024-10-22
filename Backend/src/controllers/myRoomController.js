@@ -540,6 +540,161 @@ const demoteMyAdmin = async (req, res) => {
     }
 }
 
+const saveRoom = async (req, res) => {
+    try {
+        const { userId } = req
+        const { roomId } = req.params
+
+        let room
+        try {
+            room = await Room.findById(roomId)
+            if (!room) {
+                return res.status(404).json({ error: "Room not found" })
+            }
+        } catch (err) {
+            return res.status(404).json({ error: "Room not found" })
+        }
+
+        let user
+        try {
+            user = await User.findById(userId)
+            if (!user) {
+                return res.status(404).json({ error: "User not found" })
+            }
+        } catch (err) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        if (user.savedRooms.includes(roomId)) {
+            user.savedRooms = user.savedRooms.filter(savedRoomId => savedRoomId.toString() !== roomId.toString())
+            await user.save()
+            return res.status(200).json({ success: "Room unsaved!" })
+        }
+
+        user.savedRooms.push(roomId)
+        await user.save()
+        return res.status(200).json({ success: "Room saved!" })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+}
+
+const likeRoom = async (req, res) => {
+    try {
+        const { userId } = req
+        const { roomId } = req.params
+
+        let room
+        try {
+            room = await Room.findById(roomId)
+            if (!room) {
+                return res.status(404).json({ error: "Room not found" })
+            }
+        } catch (err) {
+            return res.status(404).json({ error: "Room not found" })
+        }
+
+        let user
+        try {
+            user = await User.findById(userId)
+            if (!user) {
+                return res.status(404).json({ error: "User not found" })
+            }
+        } catch (err) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        if (user.favoriteRooms.includes(roomId)) {
+            user.favoriteRooms = user.favoriteRooms.filter(favoriteRoomsId => favoriteRoomsId.toString() !== roomId.toString())
+            await user.save()
+            return res.status(200).json({ success: "Room unliked!" })
+        }
+
+        user.favoriteRooms.push(roomId)
+        await user.save()
+        return res.status(200).json({ success: "Room liked!" })
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+}
+
+const rejectInvite = async (req, res) => {
+    try {
+        const { userId } = req
+        const { roomId } = req.params
+
+        const session = await mongoose.startSession()
+        session.startTransaction()
+
+        let room
+        try {
+            room = await Room.findById(roomId).session(session)
+            if (!room) {
+                await session.abortTransaction()
+                session.endSession()
+                return res.status(404).json({ error: "Room not found" })
+            }
+        } catch (err) {
+            await session.abortTransaction()
+            session.endSession()
+            return res.status(404).json({ error: "Room not found" })
+        }
+
+        let user
+        try {
+            user = await User.findById(userId).session(session)
+            if (!user) {
+                await session.abortTransaction()
+                session.endSession()
+                return res.status(404).json({ error: "User not found" })
+            }
+        } catch (err) {
+            await session.abortTransaction()
+            session.endSession()
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        await Room.findByIdAndUpdate(roomId, {
+            $pull: {
+                invitedUsers: userId,
+            }
+        }).session(session)
+
+        await User.findByIdAndUpdate(userId, {
+            $pull: {
+                receivedRoomInvites: { room: roomId },
+                notifications: {
+                    $in: await Notification.find({
+                        to: userId,
+                        type: "room-invite",
+                        link: `/room/${roomId}`
+                    }).select('_id').session(session)
+                }
+            }
+        }).session(session)
+
+        await Notification.deleteMany({
+            to: userId,
+            type: "room-invite",
+            link: `/room/${roomId}`
+        }).session(session)
+
+        await session.commitTransaction()
+        session.endSession()
+
+        io.to(roomId).emit('inviteRejected')
+        return res.status(201).json({ success: "Room Invite Rejected!" })
+
+    } catch (err) {
+        await session.abortTransaction()
+        session.endSession()
+        console.log(err)
+        res.status(500).json({ error: "Internal server error" })
+    }
+}
+
 module.exports =  {
     createMyRoom,
     editNameAndTheme,
@@ -548,5 +703,8 @@ module.exports =  {
     changeVideo,
     inviteUser,
     promoteToAdmin,
-    demoteMyAdmin
+    demoteMyAdmin,
+    saveRoom,
+    likeRoom,
+    rejectInvite
 }

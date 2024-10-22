@@ -268,3 +268,34 @@
   transition: height 0.3s ease; /* Smooth height transition */
   border-radius: 50px;
 }
+
+/* Room Events Animation */
+@keyframes scrollUp {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px)
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+@keyframes scrollLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(15px)
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0)
+  }
+}
+
+.room-event-animation-large {
+  animation: scrollUp 0.6s ease-in-out; /* Apply animation */
+}
+
+.room-event-animation {
+  animation: scrollLeft 0.6s ease-in-out; /* Apply animation */
+}

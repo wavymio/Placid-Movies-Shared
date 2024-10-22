@@ -56,11 +56,28 @@ const userSchema = new mongoose.Schema({
     }],
     savedRooms: [{ 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Room' 
+        ref: 'Room',
+        default: [] 
     }],
     favoriteRooms: [{ 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Room' 
+        ref: 'Room',
+        default: [] 
+    }],
+    currentRoom: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Room',
+        default: null
+    },
+    recentRooms: [{
+        roomId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Room'
+        },
+        joinedAt: {
+            type: Date,
+            default: Date.now
+        }
     }],
     notifications: [{ 
         type: mongoose.Schema.Types.ObjectId, 
