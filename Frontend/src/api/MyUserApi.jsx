@@ -178,6 +178,43 @@ export const usePatchEditMyUser = () => {
     return { patchEditUser, isLoading }
 }
 
+export const useSendVerificationEmail = () => {
+    const { addToast } = useToast()
+
+    const sendVerificationEmailRequest = async (input) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/my/user/send-verification/email`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(input)
+            })
+
+            if (!response.ok) {
+                const error = await response.json()
+                if (response.status === 409) {
+                    return error
+                }
+                throw new Error(error.error)
+            }
+
+            const data = await response.json()
+            if (data.success) {
+                addToast("success", data.success)
+                return data
+            }
+        } catch (err) {
+            addToast("error", (err.message === "Failed to fetch" ? "Network Error" : err.message))
+        }
+    }
+
+    const { mutateAsync: sendVerificationEmail, isLoading } = useMutation(sendVerificationEmailRequest)
+
+    return {sendVerificationEmail, isLoading}
+}
+
 export const usePatchEditMyUserProfilePic = () => {
     const { addToast } = useToast()
 

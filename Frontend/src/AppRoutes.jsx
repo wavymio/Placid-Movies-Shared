@@ -10,6 +10,7 @@ import UserProfile from './pages/UserProfile'
 import OtherUserProfile from './pages/OtherUserProfile'
 import MyRoom from './pages/MyRoom'
 import MyVideos from './pages/MyVideos'
+import Verification from './pages/Verification'
 
 const AppRoutes = () => {
     return (
@@ -25,6 +26,12 @@ const AppRoutes = () => {
                     <OtherUserProfile />
                 </Layout>
             } />
+
+            <Route path='/verification/:outcome/:reason?' element={
+                // <Layout>
+                    <Verification />
+                // </Layout>
+            }/>
 
             <Route element={<AuthRoute />}>
                 <Route path='/login' element={

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { useAuth } from "./AuthContext"
 import { io } from "socket.io-client"
 import { useToast } from "./ToastContext"
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const SOCKET_BASE_URL = import.meta.env.VITE_SOCKET_BASE_URL
 
 const SocketContext = createContext()
 
@@ -20,8 +20,9 @@ export const SocketProvider = ({ children }) => {
 
             setIsSocketLoading(true)
 
-            socket.current = io(API_BASE_URL, {
+            socket.current = io(SOCKET_BASE_URL, {
                 withCredentials: true,
+                transports: ['websocket', 'polling']
                 // query: { userId: loggedInUser._id } // not safe
             })
 

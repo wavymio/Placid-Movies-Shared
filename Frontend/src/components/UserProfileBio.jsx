@@ -7,11 +7,14 @@ import { useAcceptFriend, useAddFriend, useCancelFriend, useRejectFriend, useUnf
 import { TiUserAdd } from "react-icons/ti"
 import { TiUserDelete } from "react-icons/ti"
 import FriendsTab from './FriendsTab'
+import VerifyTab from './VerifyTab'
+import { FaCheckCircle } from 'react-icons/fa'
 
 const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
     const queryClient = useQueryClient()
     const [openUsername, setOpenUsername] = useState(false)
     const [openFriends, setOpenFriends] = useState(false)
+    const [openVerify, setOpenVerify] = useState(false)
     const [response, setResponse] = useState({})
     const { patchEditUser, isLoading } = usePatchEditMyUser()
     const { patchEditUserProfilePic, isLoading: isProfilePicLoading } = usePatchEditMyUserProfilePic()
@@ -74,6 +77,15 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
         }
     }
 
+    const handleOpenVerify = () => {
+        if (openVerify) {
+            setOpenVerify(false)
+            return
+        }
+
+        setOpenVerify(true)
+    }
+
     const isFriend = user?.friends.some((friend) => friend.userId._id === loggedInUser?._id)
 
     return (
@@ -105,8 +117,8 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
                     </div>
                     {sameUser? (
                         <>
-                            <Link to={''} className={`cursor-pointer bg-red-900 hidden xs:flex justify-center whitespace-nowrap px-2 py-3 w-24 sm:px-2 sm:py-4 sm:w-28 rounded-lg font-semibold text-xs sm:text-sm hover:bg-red-950 transition-colors ease-in-out duration-300`}>Verify</Link>
-                            <Link to={''} className={`cursor-pointer bg-red-900 flex xs:hidden justify-center xs:whitespace-nowrap px-3 py-3 w-14 rounded-lg font-semibold text-xs sm:text-sm hover:bg-red-950 transition-colors ease-in-out duration-300`}>Verify</Link>
+                            <button onClick={handleOpenVerify} className={`cursor-pointer ${user?.isVerified ? 'bg-neutral-200 text-neutral-700 font-extrabold hover:bg-neutral-800 hover:text-white hover:font-semibold' : 'bg-red-900 font-semibold hover:bg-red-950'} hidden xs:flex items-center justify-center whitespace-nowrap px-2 py-3 w-24 sm:px-2 sm:py-4 sm:w-28 rounded-lg text-xs sm:text-sm transition-colors ease-in-out duration-300`}>{user?.isVerified ? <span className='flex items-center justify-center gap-1'>Verified <FaCheckCircle /></span> : 'Verify'}</button>
+                            <button onClick={handleOpenVerify} className={`cursor-pointer ${user?.isVerified ? 'bg-neutral-200 text-neutral-700 font-extrabold hover:bg-neutral-800 hover:text-white hover:font-semibold' : 'bg-red-900 font-semibold hover:bg-red-950'} flex xs:hidden justify-center xs:whitespace-nowrap px-3 py-3 w-20 rounded-lg font-semibold text-xs sm:text-sm transition-colors ease-in-out duration-300`}>{user?.isVerified ? <span className='flex items-center justify-center gap-1'>Verified <FaCheckCircle /></span> : 'Verify'}</button>
                         </>
                     ) : (
                         <>
@@ -158,6 +170,10 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
 
             {openFriends &&
                 <FriendsTab  sameUser={sameUser} setOpenFriends={setOpenFriends} user={user} loggedInUser={loggedInUser} />
+            }
+
+            {openVerify &&
+                <VerifyTab handleOpenVerify={handleOpenVerify} user={user} />
             }
         </div>
     )

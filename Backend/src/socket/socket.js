@@ -11,6 +11,7 @@ const Message = require('../models/Messages')
 const app = express()
 
 const server = http.createServer(app)
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:80', 'http://localhost:5173']
 const io = new Server(server, {
     cors: {
         origin: process.env.FRONTEND_URL,
@@ -54,6 +55,7 @@ const disconnect = async (socket, testCurrentRoomId) => {
 }
 
 io.on("connection", async (socket) => {
+    console.log("we have a hit")
     // const userId = socket.handshake.query.userId // not safe
     const userId = socket.userId
     let testCurrentRoomId = null 

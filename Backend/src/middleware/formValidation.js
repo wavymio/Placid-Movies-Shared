@@ -24,7 +24,13 @@ const validateMyPatchEditRequest = [
     handleValidationErrors,
 ]
 
+const validateMyEmailRequest = [
+    body("email").isString().isEmail().notEmpty().withMessage("Invalid email format"),
+    handleValidationErrors,
+]
+
 module.exports = {
     validateMyUserRequest,
-    validateMyPatchEditRequest
+    validateMyPatchEditRequest,
+    validateMyEmailRequest,
 }

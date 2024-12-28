@@ -52,10 +52,10 @@ const createMyRoom = async (req, res) => {
             owner: userId,
             coverPhoto,
             conversation: conversationId,
-            participants: {
-                userId,
-                role: 'owner'
-            },
+            // participants: {
+            //     userId,
+            //     role: 'owner'
+            // },
             privacy: req.body.privacy,
             theme: req.body.roomTheme,
             invitedUsers,

@@ -2,6 +2,7 @@ const jwtSecret = process.env.JWT_SECRET
 const jwt = require('jsonwebtoken')
 
 const authenticateSocket = (socket, next) => {
+    console.log("socket hit")
     const jwtToken = socket.request.headers.cookie?.split('; ').find(row => row.startsWith('jwt='))?.split('=')[1]
 
     if (!jwtToken) {

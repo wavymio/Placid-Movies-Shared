@@ -123,6 +123,7 @@ const UserProfileRoomsDisplay = ({ user, rooms, tab, sameUser, location, setLoca
         const response = await createMyRoom(formData)
         if (response.success) {
             toggleCreateRoomTab()
+            await queryClient.invalidateQueries('validateUser')
         }
     }
 

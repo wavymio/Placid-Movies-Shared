@@ -3,6 +3,8 @@ const { v2: cloudinary } = require('cloudinary')
 const User = require('../models/users')
 const { userSocketMap } = require('../socket/socket')
 const generateTokenAndSetCookie = require('../utils/generateToken')
+const generateEmailVerificationToken = require('../utils/generateEmailVerificationToken')
+const sendEmail = require('../utils/emailSender')
 const uploadMedia = require('../utils/uploadMedia')
 const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10)
 
@@ -107,7 +109,102 @@ const patchEditProfilePic = async (req, res) => {
     }
 }
 
+const sendVerificationEmail = async (req, res) => {
+    try {
+        const { email } = req.body
+        if (!email) {
+            return res.status(409).json({ error: "No email available" })
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ error: "Invalid email format" })
+        }
+
+        const existingEmail = await User.findOne({ email })
+        if (existingEmail) {
+            return res.status(409).json({ error: "Email has been taken" })
+        }
+
+        const { userId } = req
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ error: "User not found" })
+        }
+
+        if (user.token && (user.tokenExpiryDate > Date.now()) && (user.pendingEmail === email)) {
+            return res.status(409).json({ error: "A verification email has already been sent"})
+        }
+
+        const token = generateEmailVerificationToken()
+        const verificationLink = `${process.env.DOMAIN_NAME}/api/my/user/verify-email?id=${userId}&token=${token}`
+
+        const emailBody = `
+                <h3>Hello, ${user.username}!</h3>
+
+                <p>Click <a href="${verificationLink}">here</a> to verify your email</p>
+                <p>This link will expire after 5 minutes. You can request for a new link after it expires.</p>
+                <p>If you didn't sign up, you can safely ignore this email.</p>
+                <br>
+                <p>Best regards,<br>Placid Society Team</p>`
+
+        try {
+            await sendEmail(email, 'Verify your Email', emailBody)
+        } catch (err) {
+            console.log('Email send error:', err)
+            return res.status(409).json({ error: "Error sending verification email"})
+        }
+
+        user.token = token
+        user.tokenExpiryDate = Date.now() + 300000 // expires in 5 mins(ms)
+        user.pendingEmail = email 
+
+        await user.save()
+
+        return res.status(200).json({ success: "Email Verification sent Successfully!" })
+        
+    } catch (err) {
+        console.log(err)
+        return res.status(500).json({error: "Internal server error"})
+    }
+}
+
+const verifyMyEmail = async (req, res) => {
+    try {
+        const { id: userId, token } = req.query
+        const user = await User.findById(userId)
+        const domainRoute = `${process.env.FRONTEND_URL || process.env.DOMAIN_NAME}/verification`
+        if (!user) return res.redirect(`${domainRoute}/failed/no-user`)
+        // if (!user) return res.status(404).json({ erorr: "User not found" })
+        if (!token) return res.redirect(`${domainRoute}/failed/no-token`)
+        // if (!token) return res.status(404).json({ error: "No available token" }) 
+        if (user.token && (user.tokenExpiryDate < Date.now())) return res.redirect(`${domainRoute}/failed/expired-token`)
+        // if (user.token && (user.tokenExpiryDate < Date.now())) return res.status(400).json({ error: "Token has Expired" })
+        if (user.token !== token) return res.redirect(`${domainRoute}/failed/fishy`)
+        // if (user.token !== token) return res.status(400).json({ error: "Something fishy is going on here" })
+
+        const emailExists = await User.findOne({ email: user.pendingEmail })
+        if (emailExists) return res.redirect(`${domainRoute}/failed/email-taken`)
+        // if (emailExists) return res.status(400).json({ error: "Sorry this email has just been taken" })
+
+        user.email = user.pendingEmail
+        user.pendingEmail = undefined
+        user.token = undefined
+        user.tokenExpiryDate = undefined
+        user.isVerified = true
+
+        await user.save()
+        return res.redirect(`${domainRoute}/successful`)
+        // return res.status(200).json({ success: "Email Verified!" })
+
+    } catch (err) {
+        console.log(err)
+        return res.redirect(`${domainRoute}/failed/internal-server-error`)
+    }
+}
+
 const getUser = async (req, res) => {
+    console.log("tried")
     try {
         const { userId } = req
         const user = await User.findById(userId)
@@ -204,6 +301,8 @@ const logoutUser = async (req, res) => {
 module.exports = {
     patchEditUsername,
     patchEditProfilePic,
+    sendVerificationEmail,
+    verifyMyEmail,
     loginUser,
     signupUser,
     getUser,

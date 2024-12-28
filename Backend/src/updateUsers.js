@@ -5,38 +5,56 @@ const Notification = require('./models/notifications');
 const Room = require('./models/rooms'); // Adjust the path to where your Room model is located
 const Video = require('./models/videos');
 
-const updateRooms = async () => {
+const updateExistingUsers = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         })
-
-        // Update all user documents by setting default values for currentRoom and recentRooms
-        const result = await User.updateMany(
-            { currentRoom: { $exists: false } }, // Only update users that don't have currentRoom
-            {
-                $set: {
-                    currentRoom: null, // Set default value for currentRoom
-                    recentRooms: [] // Set default value for recentRooms as an empty array
-                }
-            }
+        await User.updateMany(
+            {}, // Match all documents
+            { $set: { token: null, tokenExpiryDate: null, email: null, isVerified: false, pendingEmail: null } } // Set new fields
         );
-
-        console.log(`${result.nModified} user(s) updated successfully`);
-
-        // Sync indexes with the updated schema
-        await User.syncIndexes();
-        console.log('Indexes synchronized successfully.');
-    } catch (error) {
-        console.error('Error updating rooms:', error);
-    } finally {
-        // Close the connection after the update
-        mongoose.connection.close();
+        console.log('All users updated with new fields!');
+    } catch (err) {
+        console.error('Error updating users:', err);
     }
 };
 
-updateRooms();
+updateExistingUsers();
+
+// const updateRooms = async () => {
+//     try {
+//         await mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
+//             useNewUrlParser: true,
+//             useUnifiedTopology: true,
+//         })
+
+//         // Update all user documents by setting default values for currentRoom and recentRooms
+//         const result = await User.updateMany(
+//             { currentRoom: { $exists: false } }, // Only update users that don't have currentRoom
+//             {
+//                 $set: {
+//                     currentRoom: null, // Set default value for currentRoom
+//                     recentRooms: [] // Set default value for recentRooms as an empty array
+//                 }
+//             }
+//         );
+
+//         console.log(`${result.nModified} user(s) updated successfully`);
+
+//         // Sync indexes with the updated schema
+//         await User.syncIndexes();
+//         console.log('Indexes synchronized successfully.');
+//     } catch (error) {
+//         console.error('Error updating rooms:', error);
+//     } finally {
+//         // Close the connection after the update
+//         mongoose.connection.close();
+//     }
+// };
+
+// updateRooms();
 
 // const updateRooms = async () => {
 //     try {
