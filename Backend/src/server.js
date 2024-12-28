@@ -29,7 +29,7 @@ const connectToMongodb = require('./db/conncet')
 app.use(express.static(path.join(__dirname, '../../Frontend/dist')))
 
 // Middleware Setup
-const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:80', 'http://localhost:8080', 'http://localhost:5173']
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.DOMAIN_NAME, 'http://localhost:80', 'http://localhost:8080', 'http://localhost:5173']
 app.use(cors({
     origin: function (origin, callback) {
         if (allowedOrigins.includes(origin) || !origin) {
