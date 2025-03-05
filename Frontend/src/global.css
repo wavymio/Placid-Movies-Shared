@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow&family=PT+Sans&family=Raleway:wght@100;200;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
 
 @tailwind base;
 @tailwind components;
@@ -69,6 +71,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* * {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: red;
+} */
 
 /* Loading Spinner animation */
 .loader {
@@ -195,6 +207,17 @@
 /* transparent bg */
 .black-opacity {
   background: rgba(0, 0, 0, 0.4);
+}
+
+.white-opacity {
+  background: rgba(255, 255, 255, 0.3);
+  font-family: 'Orbitron', 'Barlow', sans-serif;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.logo {
+  font-family: 'Orbitron', 'Barlow', sans-serif;
 }
 
 .blacker-opacity {

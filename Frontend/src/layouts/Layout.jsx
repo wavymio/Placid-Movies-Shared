@@ -4,13 +4,15 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useToast } from '../contexts/ToastContext'
 import { useSocket } from '../contexts/SocketContext'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useLoading } from '../contexts/LoadingContext'
 import { usePlayPause } from '../contexts/PlayPauseContext'
 import { useRoomEvents } from '../contexts/RoomEventsContext'
 
 const Layout = ({ children }) => {
     const { roomId: gottenRoomId } = useParams()
+    const location = useLocation()
+    const isMapPage = location.pathname.split('/')[1] === "map"
     const queryClient = useQueryClient()
     const navigate = useNavigate()
     const { isLoading: isAuthLoading, loggedInUser } = useAuth()
@@ -229,7 +231,7 @@ const Layout = ({ children }) => {
         <div className='flex flex-col min-h-screen h-auto bg-black font-heading text-white'>
             <div ref={topGRef}></div>
             <Header/>
-            <div className={`${roomId ? 'px-0 sm:px-8 fixed sm:static' : null} container mt-16 flex-1 py-10 bg-black`}>
+            <div className={`${roomId ? 'px-0 sm:px-8 fixed sm:static' : null} ${isMapPage ? 'pt-5' : 'container py-10 '} mt-16 flex-1  bg-black`}>
                 {childrenWithProps}
             </div>
         </div>

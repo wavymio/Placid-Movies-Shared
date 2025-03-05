@@ -131,7 +131,7 @@ const userSchema = new mongoose.Schema({
 
 
 userSchema.index({ username: 1 }) 
-// userSchema.index({ email: 1 }) 
+userSchema.index({ email: 1 }) 
 userSchema.index({ sentFriendRequests: 1 }) 
 userSchema.index({ receivedFriendRequests: 1 }) 
 userSchema.index({ 'receivedRoomInvites.user': 1, 'receivedRoomInvites.room': 1 }) 

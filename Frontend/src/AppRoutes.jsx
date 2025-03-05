@@ -11,6 +11,8 @@ import OtherUserProfile from './pages/OtherUserProfile'
 import MyRoom from './pages/MyRoom'
 import MyVideos from './pages/MyVideos'
 import Verification from './pages/Verification'
+import SocietyMap from './pages/SocietyMap'
+import Continent from './pages/Continent'
 
 const AppRoutes = () => {
     return (
@@ -60,6 +62,16 @@ const AppRoutes = () => {
                 <Route path='/my-videos' element={
                     <Layout>
                         <MyVideos />
+                    </Layout>
+                } />
+                <Route path='/map' element={
+                    <Layout>
+                        <SocietyMap />
+                    </Layout>
+                } />
+                <Route path='/map/continent/:id' element={
+                    <Layout>
+                        <Continent />
                     </Layout>
                 } />
             </Route>

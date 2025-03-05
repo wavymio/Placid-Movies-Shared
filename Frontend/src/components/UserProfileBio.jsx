@@ -92,7 +92,7 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
         <div className={` w-full flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-5 md:gap-16 xs:px-0 sm:px-10`}>
             {sameUser ? (
                 <div className='relative z-10'>
-                    <img src={user?.profilePicture ? user.profilePicture : `https://via.placeholder.com/150`} alt="img" className='object-cover h-28 w-28 xs:h-32 xs:w-32 sm:h-32 sm:w-32 md:h-44 md:w-44 rounded-full' />
+                    <img src={user?.profilePicture ? user.profilePicture : `https://avatar.iran.liara.run/public`} alt="img" className='object-cover h-28 w-28 xs:h-32 xs:w-32 sm:h-32 sm:w-32 md:h-44 md:w-44 rounded-full' />
                     {isProfilePicLoading ? (
                         <div className='absolute flex items-center justify-center opacity-50 bg-black cursor-pointer top-0 h-28 w-28 xs:h-32 xs:w-32 sm:h-32 sm:w-32 md:h-44 md:w-44 rounded-full'>
                             <span className='loader'></span>
@@ -103,7 +103,7 @@ const UserProfileBio = ({ user, sameUser, loggedInUser }) => {
                 </div>
             ) : (
                 <div className=''>
-                    <img src={user?.profilePicture ? user.profilePicture : `https://via.placeholder.com/150`} alt="img" className='object-cover h-28 w-28 xs:h-32 xs:w-32 sm:h-32 sm:w-32 md:h-44 md:w-44 rounded-full' />
+                    <img src={user?.profilePicture ? user.profilePicture : `https://avatar.iran.liara.run/public`} alt="img" className='object-cover h-28 w-28 xs:h-32 xs:w-32 sm:h-32 sm:w-32 md:h-44 md:w-44 rounded-full' />
                 </div>
             )}
 

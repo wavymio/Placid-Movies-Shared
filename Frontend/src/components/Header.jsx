@@ -17,14 +17,14 @@ const Header = () => {
         <>
             <div className='bg-black py-5 w-full fixed z-30 mb-10'>
                 <div className="container mx-auto flex justify-between items-center">
-                    <Link to={'/'} className='text-sm sm:text-xl font-heading font-bold tracking-wider text-white'>
+                    <Link to={'/'} className='text-sm sm:text-xl font-heading font-bold logo tracking-wider text-white'>
                         PLÂCID
                     </Link>
-                    <div className='hidden sm:block sm:w-96 sm:relative'>
+                    <div className='hidden md:block md:w-96 md:relative'>
                         <SearchBar />
                     </div>
                     <div className='flex items-center gap-2'>
-                        <div className='sm:hidden'>
+                        <div className='md:hidden'>
                             <MobileSearchBar />
                         </div>
                         <div className='xs:hidden'>

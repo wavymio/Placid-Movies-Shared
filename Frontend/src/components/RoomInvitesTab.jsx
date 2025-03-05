@@ -94,7 +94,7 @@ const RoomInvitesTab = ({ room, loggedInUser }) => {
                                 <div key={index} className={`relative transition-colors duration-300 ease-in-out hover:bg-neutral-900  ${index === 0 && (usernames?.length < 3) ? 'rounded-t-lg' : null} ${(index === usernames?.length-1) && (usernames?.length < 3) ? 'rounded-b-lg' : null}`}>
                                     <div className={`px-4 pt-4 pb-4 cursor-pointer flex items-center gap-2 text-xs xs:text-sm ${index !== 0 ? null : 'rounded-t-lg'} ${index === usernames.length-1 ? 'rounded-b-lg' : null}`} >
                                         <span className='h-9 w-9 xs:h-12 xs:w-12 border border-neutral-800  p-1 rounded-full'>
-                                            <img src={username.profilePicture ? username.profilePicture : 'https://via.placeholder.com/150'} className='object-cover h-full w-full rounded-full' />
+                                            <img src={username.profilePicture ? username.profilePicture : 'https://avatar.iran.liara.run/public'} className='object-cover h-full w-full rounded-full' />
                                         </span>
                                         
                                         <span className='max-w-14 sm:max-w-36 overflow-hidden'>{username.username}</span>

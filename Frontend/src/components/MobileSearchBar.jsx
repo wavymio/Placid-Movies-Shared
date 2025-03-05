@@ -8,7 +8,7 @@ const MobileSearchBar = () => {
 
     return (
         <div>
-            <div onClick={() => setClicked(!clicked)} className='h-7 w-7 xs:h-10 xs:w-10 sm:h-auto sm:w-auto bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-900 transition-colors duration-300  ease-in-out cursor-pointer p-1'>
+            <div onClick={() => setClicked(!clicked)} className='h-7 w-7 xs:h-10 xs:w-10 md:h-auto md:w-auto bg-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-900 transition-colors duration-300  ease-in-out cursor-pointer p-1'>
                 <FaSearch />
             </div> 
             

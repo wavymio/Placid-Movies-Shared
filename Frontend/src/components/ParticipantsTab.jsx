@@ -37,7 +37,7 @@ const ParticipantsTab = ({ room, loggedInUser }) => {
                         <div key={index} className='w-full flex items-center justify-between bg-neutral-950 rounded-l-full rounded-r-lg pr-5 py-1'>
                             <div className='flex items-center gap-2'>
                                 <div className='h-12 w-12 sm:h-14 sm:w-14 border border-neutral-800 p-1 rounded-full'>
-                                    <img className='object-cover h-full w-full rounded-full' src={owner.userId.profilePicture} />
+                                    <img className='object-cover h-full w-full rounded-full' src={owner.userId.profilePicture ? owner.userId.profilePicture : 'https://avatar.iran.liara.run/public'} />
                                 </div>
                                 <div className='font-semibold text-xs sm:text-sm max-w-16 xs:max-w-24 sm:max-w-28 overflow-x-hidden'>{convertToUpper(owner.userId.username)}</div>
                                 <Badge className={'font-bold px-2 xs:px-4 py-2 sm:py-3 text-[11px] sm:text-sm'}>ruler</Badge>
@@ -50,7 +50,7 @@ const ParticipantsTab = ({ room, loggedInUser }) => {
                         <div key={index} className='w-full flex items-center justify-between bg-neutral-950 rounded-l-full rounded-r-lg pr-1 sm:pr-5 py-1'>
                             <div className='flex items-center gap-2'>
                                 <div className='h-12 w-12 sm:h-14 sm:w-14 border border-neutral-800 p-1 rounded-full'>
-                                    <img className='object-cover h-full w-full rounded-full' src={admin.userId.profilePicture} />
+                                    <img className='object-cover h-full w-full rounded-full' src={admin.userId.profilePicture ? admin.userId.profilePicture : 'https://avatar.iran.liara.run/public'} />
                                 </div>
                                 <div className='font-semibold text-xs sm:text-sm max-w-6 xs:max-w-16 sm:max-w-28 overflow-x-hidden'>{convertToUpper(admin.userId.username)}</div>
                                 <Badge className={'font-bold px-2 xs:px-4 py-2 sm:py-3 text-[11px] sm:text-sm bg-red-950 hover:bg-red-950'}>noble</Badge>
@@ -72,7 +72,7 @@ const ParticipantsTab = ({ room, loggedInUser }) => {
                         <div key={index} className='w-full flex items-center justify-between bg-neutral-950 rounded-l-full rounded-r-lg pr-1 sm:pr-5 py-1'>
                             <div className='flex items-center gap-2'>
                                 <div className='h-12 w-12 sm:h-14 sm:w-14 border border-neutral-800 p-1 rounded-full'>
-                                    <img className='object-cover h-full w-full rounded-full' src={peasant.userId.profilePicture} />
+                                    <img className='object-cover h-full w-full rounded-full' src={peasant.userId.profilePicture ? peasant.userId.profilePicture : 'https://avatar.iran.liara.run/public'} />
                                 </div>
                                 <div className='font-semibold text-xs sm:text-sm max-w-6 xs:max-w-12 sm:max-w-28 overflow-x-hidden'>{convertToUpper(peasant.userId.username)}</div>
                                 <Badge className={'font-bold px-2 xs:px-4 py-2 sm:py-3 text-[11px] sm:text-sm bg-green-950 hover:bg-green-950'}>peasant</Badge>

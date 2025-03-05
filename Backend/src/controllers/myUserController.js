@@ -173,7 +173,7 @@ const verifyMyEmail = async (req, res) => {
     try {
         const { id: userId, token } = req.query
         const user = await User.findById(userId)
-        const domainRoute = `${process.env.FRONTEND_URL || process.env.DOMAIN_NAME}/verification`
+        const domainRoute = `${process.env.FRONTEND_URL}/verification`
         if (!user) return res.redirect(`${domainRoute}/failed/no-user`)
         // if (!user) return res.status(404).json({ erorr: "User not found" })
         if (!token) return res.redirect(`${domainRoute}/failed/no-token`)
