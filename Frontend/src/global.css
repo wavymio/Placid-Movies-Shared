@@ -216,6 +216,13 @@ body {
   -webkit-backdrop-filter: blur(24px);
 }
 
+.black-opacity-card {
+  background: rgba(0, 0, 0, 0.4);
+  font-family: 'Orbitron', 'Barlow', sans-serif;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+}
+
 .logo {
   font-family: 'Orbitron', 'Barlow', sans-serif;
 }

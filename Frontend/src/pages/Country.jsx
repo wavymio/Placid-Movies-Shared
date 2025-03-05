@@ -1,82 +1,47 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { useNavigate, useParams } from 'react-router-dom'
+import { countryColour, handleZoomStop } from './Continent'
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { continents, scaleAndMovePath, updateDimensions } from './SocietyMap'
-import ContinentsGradients from '../components/ContinentsGradients'
 
-export const handleZoomStop = (setScale, navigate, location, transformRef, zoomType, continentScale=0) => {
-    const {state: transformState} = transformRef
-    const currentScale = transformState.scale
-    setScale(currentScale)
-    console.log("Current scale:", currentScale)
-    if (zoomType === "countryZoomOut" && currentScale <= 0.9) {
-        navigate(location)
-    }
-
-    if (zoomType === "continentZoomOut" && currentScale <= 0.8) {
-        navigate(location)
-    }
-
-    if (zoomType === "continentZoomIn" && currentScale >= 3.5) {
-        navigate(location)
-    }
-
-    if (zoomType === "worldZoomIn" && currentScale >= continentScale + 0.5) {
-        navigate(location)
-    }
-}
-export const countryColour = "rgba(255, 255, 255, 0.15)"
-export const countryColour2 = "rgba(0, 0, 0, 0.15)"
-
-const Continent = () => {
-    const { id } = useParams()
+const Country = () => {
+    const { continentId, countryId } = useParams()
     const navigate = useNavigate()
     const containerRef = useRef(null)
     const transformRef = useRef(null)
     const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
     const [myContinent, setMyContinent] = useState({})
+    const [myCountry, setMyCountry] = useState({})
     const [scale, setScale] = useState(1)
-    const [openCountryDetails, setOpenCountryDetails] = useState(false)
-    const [selectedCountry, setSelectedCountry] = useState({})
+    const [openCityDetails, setOpenCityDetails] = useState(false)
+    const [selectedCity, setSelectedCity] = useState({})
 
-    const getContinentScale = (continent) => {
-        if (!continent.name) return
-        const continentScaleMap = {
-            "Oceania": scaleAndMovePath(continent.path, 35, continent.dx-16200, continent.dy-8000),
-            "Titanis": scaleAndMovePath(continent.path, 50, continent.dx-2800, continent.dy-15000),
-            "Zentara": scaleAndMovePath(continent.path, 72, continent.dx-8000, continent.dy-35800),
-            "Eldoria": scaleAndMovePath(continent.path, 100, continent.dx-13000, continent.dy-35000),
-            "Lunaria": scaleAndMovePath(continent.path, 70, continent.dx-15300, continent.dy-16800),
-            "Vastara": scaleAndMovePath(continent.path, 35, continent.dx-12800, continent.dy-3500),
-            "Mythos": scaleAndMovePath(continent.path, 40, continent.dx-23700, continent.dy-22900),
-        }
-
-        return continentScaleMap[continent.name]
-    }
-
-    const handleCountryClick = (country, event) => {
+    const handleCityClick = (city, event) => {
         if (!transformRef.current) return
         const targetElement = event.currentTarget
 
-        if (selectedCountry.name === country.name) {
+        if (selectedCity.name === city.name) {
             transformRef.current.resetTransform(1000, "easeOut")
-            setOpenCountryDetails(false)
-            setSelectedCountry({})
+            setOpenCityDetails(false)
+            setSelectedCity({})
             return
         } else {
-            setOpenCountryDetails(true)
-            setSelectedCountry(country)
-            transformRef.current.zoomToElement(targetElement, (country.zoomScale ? country.zoomScale : 3), 1000, "easeOut")
+            setOpenCityDetails(true)
+            setSelectedCity(city)
+            transformRef.current.zoomToElement(targetElement, city.zoomScale, 1000, "easeOut")
         }
     }
-
+    
     useEffect(() => {
-        if(id) {
-            const chosenContinent = continents.filter((continent) => parseInt(continent.id) === parseInt(id))[0]
+        if(countryId && continentId) {
+            const chosenContinent = continents.filter((continent) => parseInt(continent.id) === parseInt(continentId))[0]
+            const chosenCountry = chosenContinent["countries"].filter((country) => parseInt(country.id) === parseInt(countryId))[0]
+            console.log(chosenCountry)
             console.log(chosenContinent)
             setMyContinent(chosenContinent)
+            setMyCountry(chosenCountry)
         }
-    }, [id])
+    }, [countryId, continentId])
 
     useEffect(() => {
         if (!containerRef?.current) return
@@ -91,37 +56,38 @@ const Continent = () => {
         console.log(dimensions, "Changed")
     }, [dimensions])
     
-    if (!myContinent || !myContinent.path) return (<></>)
+    if (!myContinent || !myContinent.path || !myCountry.path) return (<></>)
+
     return (
         <div className='w-[100%] h-[88vh] relative flex justify-center' ref={containerRef}>
-            <TransformWrapper ref={transformRef} minScale={0.1} maxScale={30} initialScale={1} onZoomStop={(ref) => selectedCountry?.id ?  handleZoomStop(setScale, navigate, `/map/country/${myContinent.id}/${selectedCountry.id}`, ref, "continentZoomIn") : handleZoomStop(setScale, navigate, '/map', ref, "continentZoomOut")} centerOnInit limitToBounds={true}>
+            <TransformWrapper ref={transformRef} minScale={0.1} maxScale={30} initialScale={1} 
+            onZoomStop={(ref) => handleZoomStop(setScale, navigate, `/map/continent/${myContinent.id}`, ref, "countryZoomOut")} 
+            centerOnInit limitToBounds={true}>
                 <TransformComponent wrapperStyle={{
                     width: "100%",
                     height: "100%",
-                    // background: 'red'
-                    background: myContinent.seaColor
+                    background: myCountry.surroundingColor
                 }}
                 contentStyle={{ width: "100%", height: "100%" }}>
                     <svg width="100%" height="100%" 
                     className="relative w-[100%] h-[100%] "
                     viewBox={`-3500 -3500 ${dimensions.width + 8000} ${dimensions.height + 8000}`}
-                    style={{ background: myContinent.seaColor }}
+                    style={{ background: myCountry.surroundingColor }}
                     >
-                        <ContinentsGradients />
-                        <g key={myContinent.name}
+                        <g key={myCountry.id}
                         className='cursor-pointer'>
-                            <path d={getContinentScale(myContinent)}  
-                            fill={`url(#${myContinent.gradientId})`} stroke={myContinent.sand} strokeWidth="5" />
+                            <path d={scaleAndMovePath(myCountry.path, myCountry.largeScale, myCountry.largeDx, myCountry.largeDy)}  
+                            fill={countryColour} stroke={myContinent.sand} strokeWidth="5" />
 
-                            {myContinent.countries?.map(country => (
+                            {myCountry.cities?.map(city => (
                                 <path 
-                                key={country.id} 
-                                d={scaleAndMovePath(country.path, country.scale, country.dx, country.dy)}
-                                fill={country.fill} 
-                                stroke={country.island ? '#A68A64' : selectedCountry.name === country.name ? myContinent.sand : ''} 
+                                key={city.id} 
+                                d={scaleAndMovePath(city.path, city.scale, city.dx, city.dy)}
+                                fill={countryColour} 
+                                stroke={city.island ? '#A68A64' : selectedCity.name === city.name ? myContinent.sand : ''} 
                                 strokeWidth="3"
                                 className="hover:opacity-75 cursor-pointer" 
-                                onClick={(e) => handleCountryClick(country, e)}
+                                onClick={(e) => handleCityClick(city, e)}
                             />
                             ))}
                         </g>
@@ -129,10 +95,10 @@ const Continent = () => {
                 </TransformComponent>
             </TransformWrapper>
 
-            {openCountryDetails && (
+            {openCityDetails && (
                 <div className={`${myContinent?.name === "Eldoria" ? "black-opacity-card" : "white-opacity"} flex flex-col gap-4 room-event-animation w-[200px] lg:min-h-[300px] lg:h-fit lg:w-[300px] absolute
                 top-10 right-10 lg:top-10 lg:left-10 rounded-3xl p-5 text-white`}>
-                    <div className='text-md lg:text-xl font-normal h-[15%] text-end'>{selectedCountry.name}</div>
+                    <div className='text-md lg:text-xl font-normal h-[15%] text-end'>{selectedCity.name}</div>
                     <div className='h-85% flex flex-col gap-6'>
 
                         <div className='flex flex-col gap-3 text-[10px] lg:text-xs items-start'>
@@ -168,7 +134,7 @@ const Continent = () => {
 
                         {/* Next Button */}
                         <div className='flex w-full items-center justify-end'>
-                            <div onClick={() => navigate(`/map/country/${myContinent.id}/${selectedCountry.id}`)}
+                            <div onClick={() => navigate(`/map/city/${myContinent.id}/${myCountry.id}/${selectedCity.id}`)}
                             className='py-3 lg:py-4 border-2 border-white rounded-lg w-[50%] lg:w-[35%] text-center cursor-pointer text-[10px] lg:text-xs font-bold tracking-wide hover:bg-white hover:text-black transition-all ease-out duration-500'>Explore</div>
                         </div>
                         
@@ -179,4 +145,4 @@ const Continent = () => {
     )
 }
 
-export default Continent
+export default Country

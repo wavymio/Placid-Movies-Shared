@@ -13,6 +13,8 @@ import MyVideos from './pages/MyVideos'
 import Verification from './pages/Verification'
 import SocietyMap from './pages/SocietyMap'
 import Continent from './pages/Continent'
+import Country from './pages/Country'
+import City from './pages/City'
 
 const AppRoutes = () => {
     return (
@@ -72,6 +74,16 @@ const AppRoutes = () => {
                 <Route path='/map/continent/:id' element={
                     <Layout>
                         <Continent />
+                    </Layout>
+                } />
+                <Route path='/map/country/:continentId/:countryId' element={
+                    <Layout>
+                        <Country />
+                    </Layout>
+                } />
+                <Route path='/map/city/:continentId/:countryId/:cityId' element={
+                    <Layout>
+                        <City />
                     </Layout>
                 } />
             </Route>
