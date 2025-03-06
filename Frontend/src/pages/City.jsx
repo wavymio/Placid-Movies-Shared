@@ -17,10 +17,15 @@ const City = () => {
     const [openLandDetails, setOpenLandDetails] = useState(false)
     const [selectedLand, setSelectedLand] = useState({})
     const [hasZoomedToUser, setHasZoomedToUser] = useState(false)
+    const [timeFilter, setTimeFilter] = useState(0.5)
 
     // Land/Room Rendering 
     const totalRooms = 1000
     const gridWidth = 50 // Number of columns
+    const gridHeight = Math.ceil(totalRooms / gridWidth)
+    const centerX = Math.floor(gridWidth / 2);
+    const centerY = Math.floor(gridHeight / 2);
+
     const existingRooms = [
         { id: 1, owner: "User123" },
         { id: 2, owner: "User123" },
@@ -40,8 +45,8 @@ const City = () => {
     const roomSlots = useRef(
         Array.from({ length: totalRooms }, (_, index) => ({
             id: index + 1,
-            x: (index % gridWidth) * 70, // Increased from 60 to 70
-            y: Math.floor(index / gridWidth) * 70, // Increased from 60 to 70
+            x: (index % gridWidth) * 61, // Increased from 60 to 70
+            y: Math.floor(index / gridWidth) * 61, // Increased from 60 to 70
         }))
     )
 
@@ -55,16 +60,32 @@ const City = () => {
         y: 1330
     }
 
+    const waterPatchClusters = [
+        // { startX: 5, startY: 5, size: 4 },  // Cluster at (5,5) covering 4x4 rooms
+        // { startX: 20, startY: 10, size: 6 }, // Cluster at (20,10) covering 3x3 rooms
+        { startX: centerX - 3, startY: centerY - 3, size: 5 }
+    ]
+    
+
     const roomsWithStatus = useRef(
         roomSlots.current.map((slot) => {
             const room = existingRooms.find((r) => r.id === slot.id)
-            const withWater = slot.id % 50 === 0
+            const withWater = waterPatchClusters.some((cluster) => {
+                const roomX = slot.x / 61;
+                const roomY = slot.y / 61;
+                return (
+                    roomX >= cluster.startX &&
+                    roomX < cluster.startX + cluster.size &&
+                    roomY >= cluster.startY &&
+                    roomY < cluster.startY + cluster.size
+                );
+            });
             return {
                 ...slot,
                 exists: !!room,
                 owner: room ? room.owner : null,
-                width: 60,
-                height: 60,
+                width: withWater ? 61 : 60,
+                height: withWater ? 61 : 60,
                 waterPatch: !!withWater
             }
         })
@@ -93,13 +114,11 @@ const City = () => {
             x: -positionX / currentScale,
             y: -positionY / currentScale,
         }))
-        console.log("Zoom detected, scale:", currentScale)
+        // console.log("Zoom detected, scale:", currentScale)
     }
 
-    const [initialTransform, setInitialTransform] = useState(true)
     const handleTransform = (transformRef) => {
-        if(!initialTransform) return
-        console.log("transforming")
+        // console.log("transforming")
         const {state: transformState} = transformRef
         const { scale: currentScale, positionX, positionY} = transformState
         setViewport((prev) => ({
@@ -107,7 +126,6 @@ const City = () => {
             x: -positionX / currentScale,
             y: -positionY / currentScale,
         }))
-        setTimeout(() => setInitialTransform(false), 10000)
     }
 
     useEffect(() => {
@@ -129,9 +147,9 @@ const City = () => {
                 room.y >= viewport.y - buffer &&
                 room.y <= viewport.y + viewport.height + buffer
         )
-        console.log(updatedFilteredRooms)
+        // console.log(updatedFilteredRooms)
         setFilteredRooms(updatedFilteredRooms)
-        console.log(viewport)
+        // console.log(viewport)
     }, [viewport])
 
     useEffect(() => {
@@ -143,43 +161,61 @@ const City = () => {
         return () => window.removeEventListener("resize", handleResize)
     }, [containerRef.current])
 
+    const handleZoomToLocation = (userLocation, containerRef, viewport, transformRef) => {
+        const { x, y, width, height } = userLocation // User's LocuserLocation coordinates
+        const zoomScale = 4
+        const viewportWidthScale = 
+            containerRef.current.clientWidth > 1280 ? 1.55 :
+            containerRef.current.clientWidth > 1024 ? 1.5 :
+            containerRef.current.clientWidth > 768 ? 1.4 :
+            containerRef.current.clientWidth > 640 ? 1.35 :
+            containerRef.current.clientWidth > 500 ? 1.3 :
+            containerRef.current.clientWidth > 380 ? 1.23 :
+            1.2
+        // containerRef.current.clientWidth - (containerRef.current.clientWidth - 1.5)
+        console.log("MY VIEWPORT: ", containerRef.current.clientWidth)
+        // const viewportHeightScale = viewport.height/2 > 
+
+
+        // Center the LocuserLocation in the viewport
+        // const centerX = ((x + width / 2) * zoomScale) 
+        // const centerY = ((y + height / 2) * zoomScale) 
+        const centerX = (x + width / 2) * zoomScale - viewport.width * viewportWidthScale
+        const centerY = (y + height / 2) * zoomScale - viewport.height / 1.2
+        console.log("dimensions: ", dimensions)
+        
+        // Set transform (negate values because it moves in the opposite direction)
+        transformRef.current.setTransform(-centerX, -centerY, zoomScale, 2500, "easeOut")
+
+        console.log("User Location:", userLocation)
+        console.log("Viewport:", viewport)
+        console.log("Calculated Offsets:", userLocation.x, userLocation.y)
+        console.log("Scale:", scale)
+    }
+
     useEffect(() => {
-        if (transformRef.current && userLocation && !hasZoomedToUser) {
-            const { x, y, width, height } = userLocation // User's LocuserLocation coordinates
-            const zoomScale = 4
-
-
-            // Center the LocuserLocation in the viewport
-            const centerX = ((x + width / 2) * zoomScale) - 150
-            const centerY = ((y + height / 2) * zoomScale) - 150
-            // const centerX = (x + width / 2) * zoomScale - viewport.width / 2.5
-            // const centerY = (y + height / 2) * zoomScale - viewport.height / 4
+        if (transformRef.current && userLocation && !hasZoomedToUser && containerRef.current) {
             
-            // Set transform (negate values because it moves in the opposite direction)
-            transformRef.current.setTransform(-centerX, -centerY, zoomScale, 2500, "easeOut")
-
-            console.log("User Location:", userLocation)
-            console.log("Viewport:", viewport)
-            console.log("Calculated Offsets:", userLocation.x, userLocation.y)
-            console.log("Scale:", scale)
+            handleZoomToLocation(userLocation, containerRef, viewport, transformRef)
+            
             setHasZoomedToUser(true)
         }
     }, [userLocation])
 
     // Land Matters
-    const handleLandClick = (land, event) => {
-        if (!transformRef.current) return
+    const handleLandClick = (land, event, transformRef) => {
+        if ((!transformRef.current) || (!containerRef.current)) return
         const targetElement = event.currentTarget
 
-        if (selectedLand.name === land.name) {
-            transformRef.current.resetTransform(1000, "easeOut")
+        if (selectedLand.id === land.id) {
+            userLocation ? handleZoomToLocation(userLocation, containerRef, {x: 0, y: 0, width: 1600, height: 1200}, transformRef) : transformRef.current.resetTransform(1500, "easeOut")
             setOpenLandDetails(false)
             setSelectedLand({})
             return
         } else {
             setOpenLandDetails(true)
             setSelectedLand(land)
-            transformRef.current.zoomToElement(targetElement, land.zoomScale, 1000, "easeOut")
+            transformRef.current.zoomToElement(targetElement, 3, 1000, "easeOut")
         }
     }
     
@@ -207,24 +243,45 @@ const City = () => {
                     width: "100%",
                     height: "100%",
                     // background: 'red'
-                    background: 'rgba(0, 0, 0, 0.9)'
+                    background: `rgba(0, 0, 0, ${timeFilter})`
                 }}
                 contentStyle={{ width: "100%", height: "100%" }}>
                     {filteredRooms.map((room) => (
                         <div
                         key={room.id}
-                        className="absolute flex items-center justify-center text-white cursor-pointer"
+                        className={`${room.id === selectedLand.id ? 'border border-yellow-300' : null} absolute flex items-center justify-center text-white cursor-pointer`}
                         style={{
                             left: `${room.x}px`,
                             top: `${room.y}px`,
                             background: room.id === userLocation.id ? 'linear-gradient(to bottom, #efd090, #eebd78, #eebe74)':
-                            room.waterPatch ? 'linear-gradient(to bottom, #5cc1d5, #218eb7)':
+                            room.waterPatch ? `rgba(33, 148, 183, ${1-timeFilter})`:
                             room.exists ? countryColour : countryColour2,
                             width: `${room.width}px`,
                             height: `${room.height}px`,
                             // margin: '50px'
                         }}
-                        // onClick={() => room.exists ? handleRoomClick(room) : handleBuyLand(room)}
+                        onMouseEnter={(e) => 
+                            (e.currentTarget.style.background = 
+                                room.id === userLocation.id 
+                                ? 'linear-gradient(to bottom, #efd090, #eebd78, #eebe74)'
+                                : room.waterPatch
+                                ? countryColour
+                                : room.exists
+                                ? countryColour
+                                : countryColour
+                            )}
+                        onMouseLeave={(e) =>
+                            (e.currentTarget.style.background =
+                                room.id === userLocation.id
+                                    ? 'linear-gradient(to bottom, #efd090, #eebd78, #eebe74)'
+                                    : room.waterPatch
+                                    ? `rgba(33, 148, 183, ${1-timeFilter})`
+                                    : room.exists
+                                    ? countryColour
+                                    : countryColour2)
+                        }
+                        onClick={(e) => handleLandClick(room, e, transformRef)}
+                        onDoubleClick={() => null}
                         >
                         {room.exists ? "🏠" : ""}
                         </div>
