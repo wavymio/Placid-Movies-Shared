@@ -49,7 +49,7 @@ const City = () => {
         { id: 52, owner: "User123", building: house6 },
         { id: 53, owner: "User123", building: house7 },
         { id: 54, owner: "User123", building: house8 },
-        { id: 101, owner: "User123", building: house9 },
+        // { id: 101, owner: "User123", building: house9 },
         // { id: 102, owner: "User123", building: house10 },
         // { id: 103, owner: "User123", building: house11 },
         // { id: 104, owner: "User123", building: house12 },
