@@ -1,8 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { continents, updateDimensions } from './SocietyMap'
 import { countryColour, countryColour2, handleZoomStop } from './Continent'
+import house1 from '../assets/house1.avif'
+import house2 from '../assets/house2.avif'
+import house3 from '../assets/house3.avif'
+import house4 from '../assets/house4.avif'
+import house5 from '../assets/house5.avif'
+import house6 from '../assets/house6.avif'
+import house7 from '../assets/house7.avif'
+import house8 from '../assets/house8.avif'
+// import house9 from '../assets/house9.avif'
+// import house10 from '../assets/house10.avif'
+// import house11 from '../assets/house11.avif'
+// import house12 from '../assets/house12.avif'
+// import house13 from '../assets/house13.avif'
+import { debounce } from 'lodash'
 
 const City = () => {
     const { continentId, countryId, cityId } = useParams()
@@ -27,10 +41,19 @@ const City = () => {
     const centerY = Math.floor(gridHeight / 2);
 
     const existingRooms = [
-        { id: 1, owner: "User123" },
-        { id: 2, owner: "User123" },
-        { id: 3, owner: "User123" },
-        { id: 45, owner: "User123" },
+        { id: 1, owner: "User123", building: house1 },
+        { id: 2, owner: "User123", building: house2 },
+        { id: 3, owner: "User123", building: house3 },
+        { id: 4, owner: "User123", building: house4 },
+        { id: 51, owner: "User123", building: house5 },
+        { id: 52, owner: "User123", building: house6 },
+        { id: 53, owner: "User123", building: house7 },
+        { id: 54, owner: "User123", building: house8 },
+        { id: 101, owner: "User123", building: house9 },
+        // { id: 102, owner: "User123", building: house10 },
+        // { id: 103, owner: "User123", building: house11 },
+        // { id: 104, owner: "User123", building: house12 },
+        // { id: 105, owner: "User123", building: house13 },
     ]
 
     const [viewport, setViewport] = useState({
@@ -39,6 +62,13 @@ const City = () => {
         width: dimensions.width,
         height: dimensions.height,
     })
+
+    const debouncedSetViewport = useCallback(
+        debounce((newViewport) => {
+          setViewport(newViewport);
+        }, 100), // Adjust delay as needed
+        []
+    );
 
     const [filteredRooms, setFilteredRooms] = useState([])
 
@@ -50,15 +80,16 @@ const City = () => {
         }))
     )
 
-    const userLocation = {
-        exists: false,
-        height: 60,
-        id: 1000,
-        owner: "Isy",
-        width: 60,
-        x: 3430,
-        y: 1330
-    }
+    const userLocation = null
+    // const userLocation = {
+    //     exists: false,
+    //     height: 60,
+    //     id: 1000,
+    //     owner: "Isy",
+    //     width: 60,
+    //     x: 3430,
+    //     y: 1330
+    // }
 
     const waterPatchClusters = [
         // { startX: 5, startY: 5, size: 4 },  // Cluster at (5,5) covering 4x4 rooms
@@ -86,7 +117,8 @@ const City = () => {
                 owner: room ? room.owner : null,
                 width: withWater ? 61 : 60,
                 height: withWater ? 61 : 60,
-                waterPatch: !!withWater
+                waterPatch: !!withWater,
+                building: room ? room.building : null
             }
         })
     )
@@ -96,7 +128,7 @@ const City = () => {
         const { positionX, positionY, scale } = ref.state
         setScale(scale)
 
-        setViewport((prev) => ({
+        debouncedSetViewport((prev) => ({
             ...prev,
             x: -positionX / scale,
             y: -positionY / scale,
@@ -109,10 +141,10 @@ const City = () => {
         const { scale: currentScale, positionX, positionY} = transformState
         setScale(currentScale)
 
-        setViewport((prev) => ({
+        debouncedSetViewport((prev) => ({
             ...prev,
-            x: -positionX / currentScale,
-            y: -positionY / currentScale,
+            x: -positionX / scale,
+            y: -positionY / scale,
         }))
         // console.log("Zoom detected, scale:", currentScale)
     }
@@ -121,10 +153,10 @@ const City = () => {
         // console.log("transforming")
         const {state: transformState} = transformRef
         const { scale: currentScale, positionX, positionY} = transformState
-        setViewport((prev) => ({
+        debouncedSetViewport((prev) => ({
             ...prev,
-            x: -positionX / currentScale,
-            y: -positionY / currentScale,
+            x: -positionX / scale,
+            y: -positionY / scale,
         }))
     }
 
@@ -164,6 +196,7 @@ const City = () => {
     const handleZoomToLocation = (userLocation, containerRef, viewport, transformRef) => {
         const { x, y, width, height } = userLocation // User's LocuserLocation coordinates
         const zoomScale = 4
+        setScale(zoomScale)
         const viewportWidthScale = 
             containerRef.current.clientWidth > 1280 ? 1.55 :
             containerRef.current.clientWidth > 1024 ? 1.5 :
@@ -208,6 +241,7 @@ const City = () => {
         const targetElement = event.currentTarget
 
         if (selectedLand.id === land.id) {
+            userLocation ? null : setScale(1)
             userLocation ? handleZoomToLocation(userLocation, containerRef, {x: 0, y: 0, width: 1600, height: 1200}, transformRef) : transformRef.current.resetTransform(1500, "easeOut")
             setOpenLandDetails(false)
             setSelectedLand({})
@@ -215,6 +249,7 @@ const City = () => {
         } else {
             setOpenLandDetails(true)
             setSelectedLand(land)
+            setScale(3)
             transformRef.current.zoomToElement(targetElement, 3, 1000, "easeOut")
         }
     }
@@ -253,16 +288,16 @@ const City = () => {
                         style={{
                             left: `${room.x}px`,
                             top: `${room.y}px`,
-                            background: room.id === userLocation.id ? 'linear-gradient(to bottom, #efd090, #eebd78, #eebe74)':
+                            background: room.id === userLocation?.id ? 'linear-gradient(to bottom, #efd090, #eebd78, #eebe74)':
                             room.waterPatch ? `rgba(33, 148, 183, ${1-timeFilter})`:
-                            room.exists ? countryColour : countryColour2,
+                            room.exists ? countryColour2 : countryColour2,
                             width: `${room.width}px`,
                             height: `${room.height}px`,
                             // margin: '50px'
                         }}
                         onMouseEnter={(e) => 
                             (e.currentTarget.style.background = 
-                                room.id === userLocation.id 
+                                room.id === userLocation?.id 
                                 ? 'linear-gradient(to bottom, #efd090, #eebd78, #eebe74)'
                                 : room.waterPatch
                                 ? countryColour
@@ -272,18 +307,25 @@ const City = () => {
                             )}
                         onMouseLeave={(e) =>
                             (e.currentTarget.style.background =
-                                room.id === userLocation.id
+                                room.id === userLocation?.id
                                     ? 'linear-gradient(to bottom, #efd090, #eebd78, #eebe74)'
                                     : room.waterPatch
                                     ? `rgba(33, 148, 183, ${1-timeFilter})`
                                     : room.exists
-                                    ? countryColour
+                                    ? countryColour2
                                     : countryColour2)
                         }
                         onClick={(e) => handleLandClick(room, e, transformRef)}
                         onDoubleClick={() => null}
                         >
-                        {room.exists ? "🏠" : ""}
+                        {scale > 1.5 && (
+                            <>{room.exists ? (
+                                <div className='h-full w-full flex items-center justify-center'>
+                                    <img src={room.building} className='h-[50%] w-[50%]' loading='eager'/>
+                                </div>
+                            ) : (<></>)}
+                            </>
+                        )}
                         </div>
                     ))}
                 </TransformComponent>
