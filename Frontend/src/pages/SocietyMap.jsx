@@ -108,6 +108,7 @@ export const continents = [
         scale: 5,
         seaColor: "#036093",
         dx: -4750, dy: -2000,
+        timeZoneOffset: 1,
         countries: [{ 
             id: 1, name: "Tavros", 
             path: "M180,380 L210,390 L230,410 L240,430 L230,450 L210,470 L190,480 L160,470 L140,450 L150,420 L160,400 Z",
@@ -116,6 +117,7 @@ export const continents = [
             largeDx: -10250, largeDy: -24900,
             largeScale: 60, largeFill: '',
             surroundingColor: 'linear-gradient(to bottom, #2b8c77, #2d8b5d, #57935c, #98a066, #cdaa6d 100%)',
+            timeZoneOffset: 1,
             cities: [
                 {
                     id: 1, name: "Vardania",
@@ -124,7 +126,8 @@ export const continents = [
                     fill: countryColour, stroke: "",
                     zoomScale: 6, largeDx: 0, largeDy: 0,
                     largeFill: 0,
-                    surroundingColor: 'linear-gradient(to bottom, #2d8c66, #2c8b61, #2d8b5d)'
+                    surroundingColor: 'linear-gradient(to bottom, #2d8c66, #2c8b61, #2d8b5d)',
+                    timeZoneOffset: 1,
                 },
                 {
                     id: 2, name: "Norgrad",
@@ -133,7 +136,8 @@ export const continents = [
                     fill: countryColour, stroke: "",
                     zoomScale: 6, largeDx: 0, largeDy: 0,
                     largeFill: 0,
-                    surroundingColor: 'linear-gradient(to bottom, #62955e, #729860, #829b62)'
+                    surroundingColor: 'linear-gradient(to bottom, #62955e, #729860, #829b62)',
+                    timeZoneOffset: 1,
                 },
                 {
                     id: 3, name: "Zargovia",
@@ -142,7 +146,8 @@ export const continents = [
                     fill: countryColour, stroke: "",
                     zoomScale: 6, largeDx: 0, largeDy: 0,
                     largeFill: 0,
-                    surroundingColor: 'linear-gradient(to bottom, #4e915c, #55925c, #60945d, #69965f)'
+                    surroundingColor: 'linear-gradient(to bottom, #4e915c, #55925c, #60945d, #69965f)',
+                    timeZoneOffset: 1,
                 }
             ]
         },
@@ -153,7 +158,8 @@ export const continents = [
             fill: countryColour, stroke: "",
             largeDx: -20000, largeDy: -37000,
             largeScale: 75, largeFill: '',
-            surroundingColor: 'linear-gradient(to bottom, #188bf2 20%, #268da4 80%)'
+            surroundingColor: 'linear-gradient(to bottom, #188bf2 20%, #268da4 80%)',
+            timeZoneOffset: 0,
         },
         { 
             id: 3, name: "Geldar", 
@@ -162,7 +168,8 @@ export const continents = [
             fill: countryColour, stroke: "",
             largeDx: -8500, largeDy: -38300,
             largeScale: 70, largeFill: '',
-            surroundingColor: 'linear-gradient(to bottom, #208fe7, #258db3, #2a8c82, #2c8b63)'
+            surroundingColor: 'linear-gradient(to bottom, #208fe7, #258db3, #2a8c82, #2c8b63)',
+            timeZoneOffset: 2,
         },
         { 
             id: 4, name: "Zephyria", 
@@ -171,7 +178,8 @@ export const continents = [
             fill: countryColour, stroke: "",
             largeDx: -20600, largeDy: -31350,
             largeScale: 70, largeFill: '',
-            surroundingColor: 'linear-gradient(to bottom, #A9A9A9 10%, #0077BE 90%)'
+            surroundingColor: 'linear-gradient(to bottom, #A9A9A9 10%, #0077BE 90%)',
+            timeZoneOffset: 1,
         },
         { 
             id: 5, name: "Morvath", 
@@ -180,7 +188,8 @@ export const continents = [
             fill: countryColour, stroke: "",
             largeDx: -10200, largeDy: -43000,
             largeScale: 72, largeFill: '',
-            surroundingColor: 'linear-gradient(to bottom, #248db5, #278d99, #2e8b59)'
+            surroundingColor: 'linear-gradient(to bottom, #248db5, #278d99, #2e8b59)',
+            timeZoneOffset: 0,
         },
         { 
             id: 6, name: "Vexora", 
@@ -189,7 +198,8 @@ export const continents = [
             fill: countryColour, stroke: "",
             largeDx: -14500, largeDy: -25600,
             largeScale: 66, largeFill: '',
-            surroundingColor: 'linear-gradient(to bottom, #0077BE, #0077BE)'
+            surroundingColor: 'linear-gradient(to bottom, #0077BE, #0077BE)',
+            timeZoneOffset: 2,
         }],
         naturalResources: [],
         averageTemp: 0,

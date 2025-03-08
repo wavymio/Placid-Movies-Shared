@@ -3,6 +3,7 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { useNavigate, useParams } from 'react-router-dom'
 import { continents, scaleAndMovePath, updateDimensions } from './SocietyMap'
 import ContinentsGradients from '../components/ContinentsGradients'
+import { useTimeFilter } from '../hooks/timeFilter'
 
 export const handleZoomStop = (setScale, navigate, location, transformRef, zoomType, continentScale=0) => {
     const {state: transformState} = transformRef
@@ -38,6 +39,7 @@ const Continent = () => {
     const [scale, setScale] = useState(1)
     const [openCountryDetails, setOpenCountryDetails] = useState(false)
     const [selectedCountry, setSelectedCountry] = useState({})
+    const timeFilter = useTimeFilter(myContinent?.timeZoneOffset ?? 0)
 
     const getContinentScale = (continent) => {
         if (!continent.name) return
@@ -105,7 +107,7 @@ const Continent = () => {
                     <svg width="100%" height="100%" 
                     className="relative w-[100%] h-[100%] "
                     viewBox={`-3500 -3500 ${dimensions.width + 8000} ${dimensions.height + 8000}`}
-                    style={{ background: myContinent.seaColor }}
+                    style={{ background: `rgba(0, 0, 0, ${timeFilter})` }}
                     >
                         <ContinentsGradients />
                         <g key={myContinent.name}

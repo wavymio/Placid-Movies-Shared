@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { countryColour, handleZoomStop } from './Continent'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { continents, scaleAndMovePath, updateDimensions } from './SocietyMap'
+import { useTimeFilter } from '../hooks/timeFilter'
 
 const Country = () => {
     const { continentId, countryId } = useParams()
@@ -15,6 +16,7 @@ const Country = () => {
     const [scale, setScale] = useState(1)
     const [openCityDetails, setOpenCityDetails] = useState(false)
     const [selectedCity, setSelectedCity] = useState({})
+    const timeFilter = useTimeFilter(myCountry?.timeZoneOffset ?? 0)
 
     const handleCityClick = (city, event) => {
         if (!transformRef.current) return
@@ -72,7 +74,7 @@ const Country = () => {
                     <svg width="100%" height="100%" 
                     className="relative w-[100%] h-[100%] "
                     viewBox={`-3500 -3500 ${dimensions.width + 8000} ${dimensions.height + 8000}`}
-                    style={{ background: myCountry.surroundingColor }}
+                    style={{ background: `rgba(0, 0, 0, ${timeFilter})` }}
                     >
                         <g key={myCountry.id}
                         className='cursor-pointer'>

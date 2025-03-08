@@ -329,3 +329,9 @@ body {
 .room-event-animation {
   animation: scrollLeft 0.6s ease-in-out; /* Apply animation */
 }
+
+/* City Room  Rendering */
+.room {
+  will-change: transform;
+  transform: translateZ(0);
+}

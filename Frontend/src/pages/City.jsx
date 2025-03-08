@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { continents, updateDimensions } from './SocietyMap'
@@ -11,12 +11,10 @@ import house5 from '../assets/house5.avif'
 import house6 from '../assets/house6.avif'
 import house7 from '../assets/house7.avif'
 import house8 from '../assets/house8.avif'
-// import house9 from '../assets/house9.avif'
-// import house10 from '../assets/house10.avif'
-// import house11 from '../assets/house11.avif'
-// import house12 from '../assets/house12.avif'
-// import house13 from '../assets/house13.avif'
 import { debounce } from 'lodash'
+import LandImage from '../components/LandImage'
+import { FaSkullCrossbones, FaUser } from 'react-icons/fa'
+import { useTimeFilter } from '../hooks/timeFilter'
 
 const City = () => {
     const { continentId, countryId, cityId } = useParams()
@@ -31,7 +29,8 @@ const City = () => {
     const [openLandDetails, setOpenLandDetails] = useState(false)
     const [selectedLand, setSelectedLand] = useState({})
     const [hasZoomedToUser, setHasZoomedToUser] = useState(false)
-    const [timeFilter, setTimeFilter] = useState(0.5)
+    const timeFilter = useTimeFilter(myCity?.timeZoneOffset ?? 0)
+
 
     // Land/Room Rendering 
     const totalRooms = 1000
@@ -41,19 +40,38 @@ const City = () => {
     const centerY = Math.floor(gridHeight / 2);
 
     const existingRooms = [
-        { id: 1, owner: "User123", building: house1 },
-        { id: 2, owner: "User123", building: house2 },
-        { id: 3, owner: "User123", building: house3 },
-        { id: 4, owner: "User123", building: house4 },
-        { id: 51, owner: "User123", building: house5 },
-        { id: 52, owner: "User123", building: house6 },
-        { id: 53, owner: "User123", building: house7 },
-        { id: 54, owner: "User123", building: house8 },
-        // { id: 101, owner: "User123", building: house9 },
-        // { id: 102, owner: "User123", building: house10 },
-        // { id: 103, owner: "User123", building: house11 },
-        // { id: 104, owner: "User123", building: house12 },
-        // { id: 105, owner: "User123", building: house13 },
+        { id: 1, owner: "User123", building: house1, lights: true},
+        { id: 2, owner: "User123", building: house2, lights: false},
+        { id: 3, owner: "User123", building: house3, lights: false},
+        { id: 5, owner: "User123", building: house4, lights: true},
+        { id: 6, owner: "User123", building: house7, lights: true},
+        { id: 7, owner: "User123", building: house3, lights: false},
+        { id: 8, owner: "User123", building: house1, lights: false},
+        { id: 9, owner: "User123", building: house8, lights: true},
+        { id: 10, owner: "User123", building: house6, lights: false},
+        { id: 11, owner: "User123", building: house5, lights: true},
+        { id: 12, owner: "User123", building: house5, lights: true},
+        { id: 13, owner: "User123", building: house4, lights: true},
+        { id: 14, owner: "User123", building: house2, lights: false},
+        { id: 15, owner: "User123", building: house1, lights: true},
+        { id: 16, owner: "User123", building: house8, lights: false},
+        { id: 4, owner: "User123", building: house7, lights: false},
+        { id: 51, owner: "User123", building: house4, lights: false},
+        { id: 52, owner: "User123", building: house2, lights: true},
+        { id: 53, owner: "User123", building: house1, lights: true},
+        { id: 54, owner: "User123", building: house1, lights: false},
+        { id: 55, owner: "User123", building: house6, lights: true},
+        { id: 56, owner: "User123", building: house8, lights: true},
+        { id: 57, owner: "User123", building: house5, lights: true},
+        { id: 58, owner: "User123", building: house5, lights: false},
+        { id: 59, owner: "User123", building: house3, lights: false},
+        { id: 60, owner: "User123", building: house4, lights: true},
+        { id: 61, owner: "User123", building: house1, lights: false},
+        { id: 62, owner: "User123", building: house8, lights: true},
+        { id: 63, owner: "User123", building: house7, lights: false},
+        { id: 64, owner: "User123", building: house6, lights: true},
+        { id: 65, owner: "User123", building: house3, lights: true},
+        { id: 66, owner: "User123", building: house4, lights: false},
     ]
 
     const [viewport, setViewport] = useState({
@@ -81,23 +99,11 @@ const City = () => {
     )
 
     const userLocation = null
-    // const userLocation = {
-    //     exists: false,
-    //     height: 60,
-    //     id: 1000,
-    //     owner: "Isy",
-    //     width: 60,
-    //     x: 3430,
-    //     y: 1330
-    // }
 
     const waterPatchClusters = [
-        // { startX: 5, startY: 5, size: 4 },  // Cluster at (5,5) covering 4x4 rooms
-        // { startX: 20, startY: 10, size: 6 }, // Cluster at (20,10) covering 3x3 rooms
         { startX: centerX - 3, startY: centerY - 3, size: 5 }
     ]
     
-
     const roomsWithStatus = useRef(
         roomSlots.current.map((slot) => {
             const room = existingRooms.find((r) => r.id === slot.id)
@@ -118,11 +124,11 @@ const City = () => {
                 width: withWater ? 61 : 60,
                 height: withWater ? 61 : 60,
                 waterPatch: !!withWater,
-                building: room ? room.building : null
+                building: room ? room.building : null,
+                lights: room ? !!room.lights : null
             }
         })
     )
-
 
     const handlePanningStop = (ref) => {
         const { positionX, positionY, scale } = ref.state
@@ -133,7 +139,7 @@ const City = () => {
             x: -positionX / scale,
             y: -positionY / scale,
         }))
-        console.log("panned")
+        // console.log("panned")
     }
     
     const handleZoomStop = (transformRef) => {
@@ -166,23 +172,27 @@ const City = () => {
             width: dimensions.width * 2,
             height: dimensions.height * 2,
         }))
+        // console.log("dimensions: ", dimensions)
     }, [dimensions])
 
-    useEffect(() => {
-        if (!roomsWithStatus.current) return
-
-        const buffer = 100 // Add buffer area
-        const updatedFilteredRooms = roomsWithStatus.current.filter(
+    const buffer = 100
+    const updatedFilteredRooms = useMemo(() => {
+        if (!roomsWithStatus.current) return []
+    
+        return roomsWithStatus.current.filter(
             (room) =>
                 room.x >= viewport.x - buffer &&
                 room.x <= viewport.x + viewport.width + buffer &&
                 room.y >= viewport.y - buffer &&
                 room.y <= viewport.y + viewport.height + buffer
         )
+    }, [viewport, roomsWithStatus.current])
+
+    useEffect(() => {
         // console.log(updatedFilteredRooms)
         setFilteredRooms(updatedFilteredRooms)
         // console.log(viewport)
-    }, [viewport])
+    }, [updatedFilteredRooms])
 
     useEffect(() => {
         if (!containerRef?.current) return
@@ -206,7 +216,7 @@ const City = () => {
             containerRef.current.clientWidth > 380 ? 1.23 :
             1.2
         // containerRef.current.clientWidth - (containerRef.current.clientWidth - 1.5)
-        console.log("MY VIEWPORT: ", containerRef.current.clientWidth)
+        // console.log("MY VIEWPORT: ", containerRef.current.clientWidth)
         // const viewportHeightScale = viewport.height/2 > 
 
 
@@ -236,6 +246,30 @@ const City = () => {
     }, [userLocation])
 
     // Land Matters
+    const [surroundingCells, setSurroundingCells] = useState([])
+    const getSurroundingCells = (clickedCellId, cols = 50, rows = 20) => {
+        if (!clickedCellId) return [];
+        const surroundingCells = new Set();
+
+        // Get row and column of the clicked cell
+        const row = Math.floor((clickedCellId - 1) / cols);
+        const col = (clickedCellId - 1) % cols;
+
+        // Loop through a 5x5 square around the clicked cell (distance of 2)
+        for (let r = row - 2; r <= row + 2; r++) {
+            for (let c = col - 2; c <= col + 2; c++) {
+                // Check if it's within grid bounds
+                if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                    const cellId = r * cols + c + 1;
+                    surroundingCells.add(cellId);
+                }
+            }
+        }
+
+        surroundingCells.delete(clickedCellId); // Exclude the clicked cell itself
+        return Array.from(surroundingCells)
+    };
+
     const handleLandClick = (land, event, transformRef) => {
         if ((!transformRef.current) || (!containerRef.current)) return
         const targetElement = event.currentTarget
@@ -273,7 +307,7 @@ const City = () => {
     return (
         <div style={{background: myCity.surroundingColor}}
         className='w-[100%] h-[88vh] relative flex justify-center overflow-auto' ref={containerRef}>
-            <TransformWrapper ref={transformRef} minScale={0.7} maxScale={30} initialScale={1} onTransformed={(ref) => handleTransform(ref)}  onPanningStop={(ref) => handlePanningStop(ref)} onZoomStop={(ref) => handleZoomStop(ref)} centerOnInit limitToBounds={false}>
+            <TransformWrapper ref={transformRef} minScale={1} maxScale={30} initialScale={1} onTransformed={(ref) => handleTransform(ref)}  onPanningStop={(ref) => handlePanningStop(ref)} onZoomStop={(ref) => handleZoomStop(ref)} centerOnInit limitToBounds={false}>
                 <TransformComponent wrapperStyle={{
                     width: "100%",
                     height: "100%",
@@ -284,7 +318,16 @@ const City = () => {
                     {filteredRooms.map((room) => (
                         <div
                         key={room.id}
-                        className={`${room.id === selectedLand.id ? 'border border-yellow-300' : null} absolute flex items-center justify-center text-white cursor-pointer`}
+                        className={`${room.id === selectedLand.id ? 'border border-yellow-300' :  
+                        room.id === 1 ? 'border-t-2 border-l-2 border-yellow-900': 
+                        room.id === 50 ? 'border-t-2 border-r-2 border-yellow-900' : 
+                        room.id === 951 ? 'botder-b-2 border-l-2 border-yellow-900':
+                        room.id === 1000 ? 'border-b-2 border-r-2 border-yellow-900':
+                        room.id < 50 ? 'border-t-2 border-yellow-900' : room.id%50 === 0 ?  'border-r-2 border-yellow-900' :
+                        room.id%50 === 1 ? 'border-l-2 border-yellow-900' : 
+                        room.id > 950 ? 'border-b-2 border-yellow-900' : ''
+                        }
+                        absolute flex items-center justify-center text-white cursor-pointer`}
                         style={{
                             left: `${room.x}px`,
                             top: `${room.y}px`,
@@ -318,13 +361,18 @@ const City = () => {
                         onClick={(e) => handleLandClick(room, e, transformRef)}
                         onDoubleClick={() => null}
                         >
-                        {scale > 1.5 && (
-                            <>{room.exists ? (
-                                <div className='h-full w-full flex items-center justify-center'>
-                                    <img src={room.building} className='h-[50%] w-[50%]' loading='eager'/>
-                                </div>
-                            ) : (<></>)}
-                            </>
+                        {scale > 1.5 && (selectedLand.id === room.id || getSurroundingCells(selectedLand.id).includes(room.id)) && room.exists && (
+                            <div className='h-full w-full flex items-center justify-center relative'>
+                                <LandImage src={room.building} />
+                                {/* <img src={room.building} className='h-[50%] w-[50%]' loading='lazy'/> */}
+                                <div className='absolute z-10 h-full w-full'
+                                style={{background: !room.lights ? `rgba(0, 0, 0, ${timeFilter})` : null}}></div>
+                            </div>
+                        )}
+                        {room.exists && (selectedLand.id !== room.id && !getSurroundingCells(selectedLand.id).includes(room.id)) && (
+                            <div className='h-full w-full flex items-start justify-end p-2 relative'>
+                                <div className='black-opacity h-[30%] w-[50%] flex items-center justify-center'><FaSkullCrossbones className='h-2 w-2' /></div>
+                            </div>
                         )}
                         </div>
                     ))}
