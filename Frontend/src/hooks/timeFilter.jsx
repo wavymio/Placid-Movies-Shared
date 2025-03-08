@@ -29,6 +29,7 @@ export const useTimeFilter = (utcOffset = 0) => {
     useEffect(() => {
         if (utcOffset === undefined || utcOffset === null) return
 
+        setTimeFilter(getTimeOpacity(utcOffset || 0))
         const interval = setInterval(() => {
             setTimeFilter(getTimeOpacity(utcOffset || 0))
             console.log("setting...")

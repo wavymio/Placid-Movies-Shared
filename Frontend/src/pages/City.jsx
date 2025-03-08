@@ -40,38 +40,44 @@ const City = () => {
     const centerY = Math.floor(gridHeight / 2);
 
     const existingRooms = [
-        { id: 1, owner: "User123", building: house1, lights: true},
-        { id: 2, owner: "User123", building: house2, lights: false},
-        { id: 3, owner: "User123", building: house3, lights: false},
-        { id: 5, owner: "User123", building: house4, lights: true},
-        { id: 6, owner: "User123", building: house7, lights: true},
-        { id: 7, owner: "User123", building: house3, lights: false},
-        { id: 8, owner: "User123", building: house1, lights: false},
-        { id: 9, owner: "User123", building: house8, lights: true},
-        { id: 10, owner: "User123", building: house6, lights: false},
-        { id: 11, owner: "User123", building: house5, lights: true},
-        { id: 12, owner: "User123", building: house5, lights: true},
-        { id: 13, owner: "User123", building: house4, lights: true},
-        { id: 14, owner: "User123", building: house2, lights: false},
-        { id: 15, owner: "User123", building: house1, lights: true},
-        { id: 16, owner: "User123", building: house8, lights: false},
-        { id: 4, owner: "User123", building: house7, lights: false},
-        { id: 51, owner: "User123", building: house4, lights: false},
-        { id: 52, owner: "User123", building: house2, lights: true},
-        { id: 53, owner: "User123", building: house1, lights: true},
-        { id: 54, owner: "User123", building: house1, lights: false},
-        { id: 55, owner: "User123", building: house6, lights: true},
-        { id: 56, owner: "User123", building: house8, lights: true},
-        { id: 57, owner: "User123", building: house5, lights: true},
-        { id: 58, owner: "User123", building: house5, lights: false},
-        { id: 59, owner: "User123", building: house3, lights: false},
-        { id: 60, owner: "User123", building: house4, lights: true},
-        { id: 61, owner: "User123", building: house1, lights: false},
-        { id: 62, owner: "User123", building: house8, lights: true},
-        { id: 63, owner: "User123", building: house7, lights: false},
-        { id: 64, owner: "User123", building: house6, lights: true},
-        { id: 65, owner: "User123", building: house3, lights: true},
-        { id: 66, owner: "User123", building: house4, lights: false},
+        { id: 1, owner: "User123", building: house1, buildingType: "home", lights: true},
+        { id: 2, owner: "User123", building: house2, buildingType: "school", lights: false},
+        { id: 3, owner: "User123", building: house3, buildingType: "church", lights: false},
+        { id: 5, owner: "User123", building: house4, buildingType: "hospital", lights: true},
+        { id: 6, owner: "User123", building: house7, buildingType: "police station", lights: true},
+        { id: 7, owner: "User123", building: house3, buildingType: "restaurant", lights: false},
+        { id: 8, owner: "User123", building: house1, buildingType: "mall", lights: false},
+        { id: 9, owner: "User123", building: house8, buildingType: "art gallery", lights: true},
+        { id: 10, owner: "User123", building: house6, buildingType: "hiking resort", lights: false},
+        { id: 11, owner: "User123", building: house5, buildingType: "supermarket", lights: true},
+        { id: 12, owner: "User123", building: house5, buildingType: "government premises", lights: true},
+        { id: 13, owner: "User123", building: house4, buildingType: "military base", lights: true},
+        { id: 14, owner: "User123", building: house2, buildingType: "night club", lights: false},
+        { id: 15, owner: "User123", building: house1, buildingType: "cinema", lights: true},
+        { id: 16, owner: "User123", building: house8, buildingType: "bar", lights: false},
+        { id: 4, owner: "User123", building: house7, buildingType: "city hall", lights: false},
+        { id: 51, owner: "User123", building: house4, buildingType: "bus park", lights: false},
+        { id: 52, owner: "User123", building: house2, buildingType: "musuem", lights: true},
+        { id: 53, owner: "User123", building: house1, buildingType: "capital building", lights: true},
+        { id: 54, owner: "User123", building: house1, buildingType: "recreational park", lights: false},
+        { id: 55, owner: "User123", building: house6, buildingType: "hotel", lights: true},
+        { id: 56, owner: "User123", building: house8, buildingType: "library", lights: true},
+        { id: 57, owner: "User123", building: house5, buildingType: "gun store", lights: true},
+        { id: 58, owner: "User123", building: house5, buildingType: "fire department", lights: false},
+        { id: 59, owner: "User123", building: house3, buildingType: "home", lights: false},
+        { id: 60, owner: "User123", building: house4, buildingType: "post office", lights: true},
+        { id: 61, owner: "User123", building: house1, buildingType: "sports center", lights: false},
+        { id: 62, owner: "User123", building: house8, buildingType: "coffee shop", lights: true},
+        { id: 63, owner: "User123", building: house7, buildingType: "farmer's market", lights: false},
+        { id: 64, owner: "User123", building: house6, buildingType: "butchery", lights: true},
+        { id: 65, owner: "User123", building: house3, buildingType: "bank", lights: true},
+        { id: 66, owner: "User123", building: house4, buildingType: "jail", lights: false},
+        { id: 101, owner: "User123", building: house6, buildingType: "airport", lights: false},
+        { id: 102, owner: "User123", building: house8, buildingType: "gym", lights: true},
+        { id: 103, owner: "User123", building: house3, buildingType: "prison", lights: true},
+        { id: 104, owner: "User123", building: house1, buildingType: "pharmacy", lights: false},
+        { id: 105, owner: "User123", building: house5, buildingType: "spa", lights: true},
+        { id: 106, owner: "User123", building: house7, buildingType: "zoo", lights: false},
     ]
 
     const [viewport, setViewport] = useState({
@@ -125,7 +131,8 @@ const City = () => {
                 height: withWater ? 61 : 60,
                 waterPatch: !!withWater,
                 building: room ? room.building : null,
-                lights: room ? !!room.lights : null
+                lights: room ? !!room.lights : null,
+                buildingType: room?.building ? room.buildingType : null
             }
         })
     )
@@ -266,9 +273,9 @@ const City = () => {
             }
         }
 
-        surroundingCells.delete(clickedCellId); // Exclude the clicked cell itself
+        // surroundingCells.delete(clickedCellId); // Exclude the clicked cell itself
         return Array.from(surroundingCells)
-    };
+    }
 
     const handleLandClick = (land, event, transformRef) => {
         if ((!transformRef.current) || (!containerRef.current)) return
@@ -287,6 +294,18 @@ const City = () => {
             transformRef.current.zoomToElement(targetElement, 3, 1000, "easeOut")
         }
     }
+
+    useEffect(() => {
+        if (selectedLand.id) {
+            const timeoutId = setTimeout(() => {
+                const requiredCells = getSurroundingCells(selectedLand.id)
+                setSurroundingCells(requiredCells)
+            }, 1500)
+            return () => clearTimeout(timeoutId)
+        } else {
+            setSurroundingCells([])
+        }
+    }, [selectedLand])
     
     useEffect(() => {
         if(countryId && continentId && cityId) {
@@ -361,7 +380,7 @@ const City = () => {
                         onClick={(e) => handleLandClick(room, e, transformRef)}
                         onDoubleClick={() => null}
                         >
-                        {scale > 1.5 && (selectedLand.id === room.id || getSurroundingCells(selectedLand.id).includes(room.id)) && room.exists && (
+                        {scale > 1.5 && (selectedLand.id === room.id || surroundingCells?.includes(room.id)) && room.exists && (
                             <div className='h-full w-full flex items-center justify-center relative'>
                                 <LandImage src={room.building} />
                                 {/* <img src={room.building} className='h-[50%] w-[50%]' loading='lazy'/> */}
@@ -369,7 +388,7 @@ const City = () => {
                                 style={{background: !room.lights ? `rgba(0, 0, 0, ${timeFilter})` : null}}></div>
                             </div>
                         )}
-                        {room.exists && (selectedLand.id !== room.id && !getSurroundingCells(selectedLand.id).includes(room.id)) && (
+                        {room.exists && (selectedLand.id !== room.id && !surroundingCells?.includes(room.id)) && (
                             <div className='h-full w-full flex items-start justify-end p-2 relative'>
                                 <div className='black-opacity h-[30%] w-[50%] flex items-center justify-center'><FaSkullCrossbones className='h-2 w-2' /></div>
                             </div>
@@ -378,6 +397,72 @@ const City = () => {
                     ))}
                 </TransformComponent>
             </TransformWrapper>
+
+            {openLandDetails && selectedLand && (
+                <div className={`${myContinent?.name === "Eldoria" ? "black-opacity-card" : "white-opacity"} flex flex-col gap-4 room-event-animation w-[200px] lg:min-h-[300px] lg:h-fit lg:w-[300px] absolute
+                top-10 right-10 lg:top-10 lg:left-10 rounded-3xl p-5 text-white`}>
+                    <div className='text-md lg:text-xl font-normal h-[15%] text-end'>{myCity.name.slice(0, 3)}0{selectedLand.id}</div>
+                    <div className='h-85% flex flex-col gap-6'>
+
+                        <div className='flex flex-col gap-3 text-[10px] lg:text-xs items-start'>
+                            {selectedLand.exists && (
+                                <div className='flex w-full items-center gap-4 justify-between'>
+                                    <div>Owner:</div>
+                                    <div className=''>{selectedLand.owner}</div>
+                                </div>
+                            )}
+                            {selectedLand.building && (
+                                <div className='flex w-full items-center gap-4 justify-between'>
+                                    <div>Type:</div>
+                                    <div className='capitalize'>{selectedLand.buildingType}</div>
+                                </div>
+                            )}
+                            {selectedLand.waterPatch ? (
+                                <div className='flex w-full items-center gap-4 justify-between'>
+                                    <div>Sealife:</div>
+                                    <div>95</div>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className='flex w-full items-center gap-4 justify-between'>
+                                        <div>Animals:</div>
+                                        <div>95</div>
+                                    </div>
+                                    <div className='flex w-full items-center gap-4 justify-between'>
+                                        <div>Birds:</div>
+                                        <div>1120</div>
+                                    </div>
+                                    <div className='flex w-full items-center gap-4 justify-between'>
+                                    <div>Trees:</div>
+                                        <div>10000</div>
+                                    </div>
+                                </>
+                            )}
+                            
+                            <div className='flex w-full items-center gap-4 justify-between'>
+                                <div>Resources:</div>
+                                <div className='truncate'>Gold, Silver</div>
+                            </div>
+                            <div className='flex w-full items-center gap-4 justify-between'>
+                                <div>People Present:</div>
+                                <div>2</div>
+                            </div>
+                        </div>
+
+                        <div className={`flex w-full items-center ${selectedLand.exists ? 'justify-end' : 'justify-between'} `}>
+                            {!selectedLand.exists && (
+                                <div onClick={() => null}
+                                className='py-3 lg:py-4 border-2 border-white rounded-lg w-[40%] lg:w-[35%] text-center cursor-pointer text-[10px] lg:text-xs font-bold tracking-wide hover:bg-white hover:text-black transition-all ease-out duration-500'>
+                                    Claim
+                                </div>
+                            )}
+                            <div onClick={() => navigate(`/room/66fbe68beb3eb71e0c26fb8c`)}
+                            className='py-3 lg:py-4 border-2 border-white rounded-lg w-[40%] lg:w-[35%] text-center cursor-pointer text-[10px] lg:text-xs font-bold tracking-wide hover:bg-white hover:text-black transition-all ease-out duration-500'>Explore</div>
+                        </div>
+                        
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
